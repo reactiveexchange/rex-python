@@ -1,0 +1,61 @@
+name: Test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [
+          "windows-py37",
+          "windows-py38",
+
+          "ubuntu-py37",
+          "ubuntu-py38",
+
+          "macos-py37",
+          "macos-py38",
+        ]
+        include:
+          - name: "windows-py37"
+            python: "3.7"
+            os: windows-latest
+            tox_env: "py37"
+          - name: "windows-py38"
+            python: "3.8"
+            os: windows-latest
+            tox_env: "py38"
+          - name: "ubuntu-py37"
+            python: "3.7"
+            os: ubuntu-latest
+            tox_env: "py37"
+          - name: "ubuntu-py38"
+            python: "3.8"
+            os: ubuntu-latest
+            tox_env: "py38"
+          - name: "macos-py37"
+            python: "3.7"
+            os: macos-latest
+            tox_env: "py37"
+          - name: "macos-py38"
+            python: "3.8"
+            os: macos-latest
+            tox_env: "py38"
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox coverage
+
+    - name: Test with tox
+      if: "! matrix.use_coverage"
+      run: "tox -e ${{ matrix.tox_env }}"
