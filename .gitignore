@@ -1,0 +1,36 @@
+# Editors and IDEs.
+*~
+.editorconfig
+.ipynb_checkpoints/
+.vscode
+/.idea/
+
+# OSX.
+.DS_Store
+
+# Build.
+*.pyc
+.gitlab-ci.yml
+/build/
+/dist/
+
+# Testing.
+/.coverage
+/.tox/
+/cover/
+
+# Data.
+*.png
+*.zip
+
+# Python egg metadata, regenerated from source files by setuptools.
+*.egg-info
+/*.egg
+/.eggs/
+
+# Virtual environments.
+/env/
+/venv/
+
+# test jupyter book
+notebook/
