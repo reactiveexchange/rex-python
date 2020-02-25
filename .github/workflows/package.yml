@@ -1,15 +1,12 @@
-name: Publish
+name: Package
 
 on:
   push:
-    branches:
-      - master
     tags:
-      - '*'
+      - v*
 
 jobs:
-  deploy:
-    if: github.repository == 'reactiveexchange/rex-py' && startsWith(github.event.ref, 'refs/tags')
+  package:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2

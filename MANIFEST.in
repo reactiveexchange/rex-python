@@ -5,6 +5,7 @@ include requirements.txt
 include tox.ini
 
 graft tests
+prune .github
 
 global-exclude *.pyc
 global-exclude *.pyo
