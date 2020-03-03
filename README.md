@@ -1,4 +1,4 @@
-# REX Python
+# Reactive-Platform Python
 
 ## Getting Started
 

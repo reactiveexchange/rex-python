@@ -17,9 +17,11 @@
 Setup file.
 """
 
-from setuptools import setup
+from setuptools import setup, find_namespace_packages
 
 setup(
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
+    package_dir={"": "src"},
+    packages=find_namespace_packages(where="src"),
 )

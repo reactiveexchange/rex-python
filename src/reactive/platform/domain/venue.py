@@ -16,7 +16,7 @@
 from copy import deepcopy
 from json import dumps, loads
 
-from rex.domain.util import convert
+from reactive.platform.domain.util import convert
 
 
 class Venue:
