@@ -4,22 +4,22 @@
 Quickstart
 ==========
 
-To use rex-py package to access reactive exchange platform, a API token must be used, and it can be
-created from the trading platform under account settings.
+To use reactive-platform package to access reactive platform, a API token must be used,
+and it can be created from the trading platform under account settings.
 
 ----------------
-Create RexClient
+Create Client
 ----------------
 
-RexClient represents rex client class, and a user must to create a rex client first with
+`Client` represents a client class, and a user must to create a client first with
 API key and platform API url
 
 .. code:: python
 
-    from rex.client import RexClient
+    from reactive.platform.client import Client
     key = 'xxx'
     url = "https://api.crossfire-dev.reactivemarkets.net"
-    rc = RexClient(key=key, url=url)
+    rc = Client(key=key, url=url)
 
 Use methods of `rc` client to access data.
 

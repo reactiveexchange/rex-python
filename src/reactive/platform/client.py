@@ -15,7 +15,7 @@
 """
 Summary
 -------
-RexClient can access exchange trading platform, use auth token can allow clients to access
+Client can access trading platform, use auth token can allow clients to access
 the platform via python. Accessed data includes reference, trading data and even send requests.
 
 """
@@ -24,17 +24,17 @@ the platform via python. Accessed data includes reference, trading data and even
 import os
 import requests
 
-from rex.constant import ASSET_PATH, INSTR_PATH, VENUE_PATH, MARKET_PATH
-from rex.domain.asset import AssetRefData
-from rex.domain.instr import InstrRefData
-from rex.domain.market import MarketRefData
-from rex.domain.venue import VenueRefData
-from rex.util.cache import Cached
+from reactive.platform.constant import ASSET_PATH, INSTR_PATH, VENUE_PATH, MARKET_PATH
+from reactive.platform.domain.asset import AssetRefData
+from reactive.platform.domain.instr import InstrRefData
+from reactive.platform.domain.market import MarketRefData
+from reactive.platform.domain.venue import VenueRefData
+from reactive.platform.util.cache import Cached
 
 
-class RexClient(metaclass=Cached):
+class Client(metaclass=Cached):
     """
-    RexClient represents client object to access reactive exchange platform.
+    Client represents client object to access reactive exchange platform.
     """
 
     def __init__(self, key=None, url="https://api.crossfire-dev.reactivemarkets.net"):

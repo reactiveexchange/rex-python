@@ -17,7 +17,7 @@ from copy import deepcopy
 from json import dumps, loads
 from typing import List
 
-from rex.domain.util import convert
+from reactive.platform.domain.util import convert
 
 
 class Market:

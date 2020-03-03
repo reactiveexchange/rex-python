@@ -15,10 +15,10 @@
 
 import unittest
 
-from rex.domain.asset import AssetRefData
-from rex.domain.instr import InstrRefData
-from rex.domain.market import MarketRefData
-from rex.domain.venue import VenueRefData
+from reactive.platform.domain.asset import AssetRefData
+from reactive.platform.domain.instr import InstrRefData
+from reactive.platform.domain.market import MarketRefData
+from reactive.platform.domain.venue import VenueRefData
 
 
 class AssetRefDataTestCase(unittest.TestCase):
