@@ -13,13 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
-
-import flatbuffers
-import websockets
 import reactive.platform.fbs.MarketData as fbsmd
 
-from typing import List, AnyStr, Callable
+from typing import List, AnyStr
 
 from reactive.platform.fbs.Body import Body
 from reactive.platform.fbs.MarketDataRequestReject import MarketDataRequestReject
@@ -28,54 +24,61 @@ from reactive.platform.fbs.SubReqType import SubReqType
 
 from reactive.platform.marketdata.marketdata import MarketData
 from reactive.platform.marketdata.marketdatarequest import build_md_request
+from reactive.platform.websocket.client import Client
 
 
 def md_null_handler(md: MarketData):
     pass
 
 
-class MDClient:
+class MDClient(Client):
+    """
+    MDClient is a derived class of Client and handle market data connection, client cloud
+    send market data request by subscribe and unsubscribe method and receive market data
+    or market data reject. Market data reject will display in the console, and flatbuffers
+    formatted market data will be converted into MarketData object and call the callback
+    handle. Client must provide handler function which has the contact like handler(MarketData)
 
-    ADDRESS = 'ws://localhost:9000/md'
+    """
 
-    def __init__(self, addr: str = None,
-                 md_handler: Callable[[MarketData], None] = md_null_handler):
-        self.__addr = addr if addr is not None else self.ADDRESS
-        self.__conn = websockets.connect(self.__addr)
-        self.__builder = flatbuffers.Builder(1400)
-        self.__handler = md_handler
+    ADDRESS = 'ws://127.0.0.1:8989/md'
+
+    def __init__(self, addr: str = None):
+        addr = addr if addr is not None else self.ADDRESS
+        super().__init__(addr)
         self.__subCache = dict()
-        self.__queue = asyncio.Queue(10)
-
-    def register_md_handler(self, handler: Callable[[MarketData], None]):
-        self.__handler = handler
-
-    @property
-    def conn(self):
-        return self.__conn
 
     async def subscribe(self, markets: List[str]):
         for market in markets:
             self.__subCache[market] = True
-        await self.__queue.put(build_md_request(markets, SubReqType.Subscribe, self.__builder))
+        await self.send(build_md_request(markets, SubReqType.Subscribe, self.builder))
 
     async def unsubscribe(self, markets: List[str]):
         for market in markets:
             if market in self.__subCache:
                 del self.__subCache[market]
-        await self.__queue.put(build_md_request(markets, SubReqType.Unsubscribe, self.__builder))
+        await self.send(build_md_request(markets, SubReqType.Unsubscribe, self.builder))
 
-    async def read(self, buf: AnyStr):
+    async def _read(self, buf: AnyStr):
+        """
+        _read overrides the Client _read method, and decoding buffer into fbs.MarketData
+        and fbs.MarketDataRequestReject. If Message is fbs.MarketData, convert into MarketData
+        object, and call the callback handler, which accepts MarketData object.
+        """
         msg = Message.GetRootAsMessage(buf, 0)
         if msg.BodyType() == Body.MarketData:
             fbs_md = fbsmd.MarketData()
             fbs_md.Init(msg.Body().Bytes, msg.Body().Pos)
             md = MarketData.load_from_flat_buffer(0, fbs_md)
-            self.__handler(md)
+            self.handler(md)
         elif msg.BodyType() == Body.MarketDataRequestReject:
             mdrr = MarketDataRequestReject()
             mdrr.Init(msg.Body().Bytes, msg.Body().Pos)
             print("market data request is rejected", mdrr.ErrorCode(), mdrr.ErrorMessage())
 
-    async def write(self):
-        return await self.__queue.get()
+    async def run(self, app_run, handler=md_null_handler):
+        """
+        MDClient expects handler callback method accept MarketData object like
+        handler(MarketData), instead of handler(fbs.Message) in base Client.
+        """
+        await super().run(app_run, handler)
