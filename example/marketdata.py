@@ -18,7 +18,6 @@ import random
 
 from reactive.platform.marketdata.mdclient import MDClient
 from reactive.platform.marketdata.marketdata import MarketData
-from reactive.platform.marketdata.run import run
 
 MARKET_LIST = ["EURUSD-REX", "EURGBP-REX", "EURCHF-REX", "EURRON-REX", "USDCAD-REX",
                "USDCHF-REX", "USDJPY-REX", "USDCHF-REX", "EURJPY-REX", "AUDUSD-REX"]
@@ -40,25 +39,24 @@ def md_print_handler(md: MarketData):
 
 async def app_run(c: MDClient):
     """
-    implement an application run coroutine to assign market data callback, and subscribe or
+    implement an application run coroutine to and subscribe or
     unsubscribe markets.
     """
 
-    # assign market data callback
-    c.register_md_handler(md_print_handler)
-
+    # unknown markets, expect an reject message
+    await c.subscribe(["EURGBP-CME"])
     while True:
         market = random_market()
         print("sub", market)
         await c.subscribe([market])
-        await asyncio.sleep(5)
+        await asyncio.sleep(2)
         print("unsub", market)
         await c.unsubscribe([market])
-        await asyncio.sleep(5)
+        await asyncio.sleep(2)
 
 
 if __name__ == "__main__":
     # use default setting
-    client = MDClient()
-    run = asyncio.ensure_future(run(client, app_run))
+    client = MDClient(addr='ws://127.0.0.1:8989/md')
+    run = asyncio.ensure_future(client.run(app_run, md_print_handler))
     asyncio.get_event_loop().run_until_complete(run)

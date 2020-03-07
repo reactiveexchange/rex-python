@@ -12,12 +12,12 @@ class Body(object):
     Exec = 6
     Posn = 7
     MarketData = 8
-    MarketDataRequest = 9
-    MarketDataRequestReject = 10
-    MarketInfo = 11
-    RevalRates = 12
-    PublicTrade = 13
-    FullAmount = 14
-    Quote = 15
-    DealerQuote = 16
+    MarketInfo = 9
+    RevalRates = 10
+    PublicTrade = 11
+    FullAmount = 12
+    Quote = 13
+    DealerQuote = 14
+    MarketDataRequest = 15
+    MarketDataRequestReject = 16
 
