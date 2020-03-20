@@ -27,7 +27,7 @@ from reactive.platform.marketdata.marketdatarequest import build_md_request
 from reactive.platform.websocket.client import Client
 
 
-def md_null_handler(md: MarketData):
+def md_null_handler(md: MarketData = None):
     pass
 
 
@@ -41,11 +41,19 @@ class MDClient(Client):
 
     """
 
-    ADDRESS = 'ws://127.0.0.1:8989/md'
+    ADDRESS = 'wss://api.platform.reactivemarkets.com/stream'
 
-    def __init__(self, addr: str = None):
+    def __init__(self, addr: str = None, key: str = None):
+        """
+        Parameters
+        ----------
+        addr: str
+            web socket server address
+        key: str
+            platform API token.
+        """
         addr = addr if addr is not None else self.ADDRESS
-        super().__init__(addr)
+        super().__init__(key=key, addr=addr)
         self.__subCache = dict()
 
     async def subscribe(self, markets: List[str]):

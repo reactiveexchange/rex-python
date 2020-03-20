@@ -18,8 +18,6 @@ import websockets
 
 from typing import Callable, AnyStr, Coroutine
 
-HOST = "ws://localhost:8989/md"
-
 
 async def consume(ws: websockets.WebSocketClientProtocol, handler: Callable[[AnyStr], Coroutine]):
     """

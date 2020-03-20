@@ -37,22 +37,25 @@ class Client(metaclass=Cached):
     Client represents client object to access reactive exchange platform.
     """
 
-    def __init__(self, key=None, url="https://api.crossfire-dev.reactivemarkets.net"):
+    URL = "https://api.platform.reactivemarkets.com"
+
+    def __init__(self, url: str = None, key: str = None):
         """
         Create RexClient.
 
         Parameters
         ----------
-        key: str
-            exchange API token.
         url: url
             trading platform api url.
+        key: str
+            exchange API token.
         """
         key = key if key is not None else os.getenv("REACTIVE_API_TOKEN")
         if key is None:
             raise RuntimeError("no API key found")
+
         self.__headers = {'Authorization': 'Bearer ' + key}
-        self.__url = url
+        self.__url = url if url is not None else self.URL
 
     def fetch_asset_ref_data(self):
         """
