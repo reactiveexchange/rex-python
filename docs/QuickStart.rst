@@ -12,14 +12,14 @@ Create Client
 ----------------
 
 `Client` represents a client class, and a user must to create a client first with
-API key and platform API url
+API key and platform address.
 
 .. code:: python
 
     from reactive.platform.client import Client
     key = 'xxx'
-    url = "https://api.crossfire-dev.reactivemarkets.net"
-    rc = Client(key=key, url=url)
+    url = "https://api.platform.reactivemarkets.com"
+    rc = Client(url=url, key=key)
 
 Use methods of `rc` client to access data.
 

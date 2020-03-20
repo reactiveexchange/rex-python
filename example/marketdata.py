@@ -15,16 +15,20 @@
 import asyncio
 import random
 
-
 from reactive.platform.marketdata.mdclient import MDClient
 from reactive.platform.marketdata.marketdata import MarketData
 
 MARKET_LIST = ["EURUSD-REX", "EURGBP-REX", "EURCHF-REX", "EURRON-REX", "USDCAD-REX",
-               "USDCHF-REX", "USDJPY-REX", "USDCHF-REX", "EURJPY-REX", "AUDUSD-REX"]
+               "USDCHF-REX", "USDJPY-REX", "USDCHF-REX", "EURJPY-REX", "AUDUSD-REX",
+               "BCHUSD-BFN", "BTCUSD-BFN", "ETHUSD-BFN", "LTCUSD-BFN", "XRPUSD-BFN",
+               "BCHUSD-BIN", "BTCUSD-BIN", "ETHUSD-BIN", "LTCUSD-BIN", "XRPUSD-BIN",
+               "BCHUSD-CNB", "BTCUSD-CNB", "ETHUSD-CNB", "LTCUSD-CNB", "XRPUSD-CNB"]
+TOKEN = ""
+ADDR = "wss://api.platform.reactivemarkets.com/stream"
 
 
 def random_market():
-    index = random.randint(0, 9)
+    index = random.randint(0, len(MARKET_LIST) - 1)
     return MARKET_LIST[index]
 
 
@@ -44,19 +48,19 @@ async def app_run(c: MDClient):
     """
 
     # unknown markets, expect an reject message
-    await c.subscribe(["EURGBP-CME"])
+    await c.subscribe(["BTCUSD-CME"])
     while True:
         market = random_market()
         print("sub", market)
         await c.subscribe([market])
-        await asyncio.sleep(2)
+        await asyncio.sleep(3)
         print("unsub", market)
         await c.unsubscribe([market])
-        await asyncio.sleep(2)
+        await asyncio.sleep(1)
 
 
 if __name__ == "__main__":
     # use default setting
-    client = MDClient(addr='ws://127.0.0.1:8989/md')
+    client = MDClient(addr=ADDR, key=TOKEN)
     run = asyncio.ensure_future(client.run(app_run, md_print_handler))
     asyncio.get_event_loop().run_until_complete(run)

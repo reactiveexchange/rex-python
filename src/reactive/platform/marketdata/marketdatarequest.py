@@ -24,6 +24,24 @@ import reactive.platform.fbs.Message as Message
 
 
 def build_md_request(markets: List[str], sub_type: int, builder: flatbuffers.Builder):
+    """
+    Create flatbuffer market data request message.
+
+    Parameters
+    ----------
+    markets: List[str]
+        list of market string
+    sub_type: int
+        1: Subscribe
+        2: unsubscribe
+
+    builder: flatbuffers.Builder
+
+    Returns
+    -------
+    bytearray:
+        market data request message byte array.
+    """
     build_market = []
     size = len(markets)
     for market in markets:

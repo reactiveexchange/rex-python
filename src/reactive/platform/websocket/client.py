@@ -19,6 +19,7 @@ import flatbuffers
 import websockets
 
 from typing import AnyStr, Callable
+from websockets.http import Headers
 
 from reactive.platform.fbs.Message import Message
 from reactive.platform.marketdata.marketdata import MarketData
@@ -27,11 +28,22 @@ from reactive.platform.websocket.websocket import consume, produce
 
 class Client:
 
-    HOST = "ws://localhost:8989"
+    ADDRESS = "wss://api.platform.reactivemarkets.com/stream"
 
-    def __init__(self, addr: str = None):
+    def __init__(self, addr: str = None, key: str = None):
+        """
+        Create a web socket client to connect platform.
+
+        Parameters
+        ----------
+        addr: str
+            address for a service, like ws://host:port
+        key: str
+            key represents API key, which is used for verifying identity.
+        """
         self.__addr = addr if addr is not None else self.ADDRESS
-        self.__conn = websockets.connect(self.__addr)
+        header = Headers(Authorization="Bearer " + key) if key is not None else None
+        self.__conn = websockets.connect(self.__addr, extra_headers=header)
         self.__builder = flatbuffers.Builder(1400)
         self.__handler = None
         self.__queue = asyncio.Queue(10)
@@ -88,10 +100,10 @@ class Client:
         async with self.conn as ws:
             consumer_task = asyncio.ensure_future(consume(ws, self._read))
             producer_task = asyncio.ensure_future(produce(ws, self._write))
-            app_task = asyncio.ensure_future(app_run(self))
+            asyncio.ensure_future(app_run(self))
             done, pending = await asyncio.wait(
-                [consumer_task, producer_task, app_task],
-                return_when=asyncio.ALL_COMPLETED,
+                [consumer_task, producer_task],
+                return_when=asyncio.FIRST_COMPLETED,
             )
             for task in pending:
                 task.cancel()
