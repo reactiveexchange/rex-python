@@ -15,8 +15,8 @@
 import asyncio
 import random
 
-from reactive.platform.marketdata.mdclient import MDClient
-from reactive.platform.marketdata.marketdata import MarketData
+from reactive.platform.feed.feedclient import FeedClient
+from reactive.platform.feed.level2book import Level2Book
 
 MARKET_LIST = ["EURUSD-REX", "EURGBP-REX", "EURCHF-REX", "EURRON-REX", "USDCAD-REX",
                "USDCHF-REX", "USDJPY-REX", "USDCHF-REX", "EURJPY-REX", "AUDUSD-REX",
@@ -24,7 +24,7 @@ MARKET_LIST = ["EURUSD-REX", "EURGBP-REX", "EURCHF-REX", "EURRON-REX", "USDCAD-R
                "BCHUSD-BIN", "BTCUSD-BIN", "ETHUSD-BIN", "LTCUSD-BIN", "XRPUSD-BIN",
                "BCHUSD-CNB", "BTCUSD-CNB", "ETHUSD-CNB", "LTCUSD-CNB", "XRPUSD-CNB"]
 TOKEN = ""
-ADDR = "wss://api.platform.reactivemarkets.com/stream"
+ADDR = "wss://api.platform.reactivemarkets.com/feed"
 
 
 def random_market():
@@ -32,16 +32,16 @@ def random_market():
     return MARKET_LIST[index]
 
 
-def md_print_handler(md: MarketData):
+def md_print_handler(md: Level2Book):
     """
     implement a market data callback handler to print best bid and offer.
     """
-    best_bid = md.bid_price[0] if len(md.bid_price) > 0 else None
-    best_offer = md.offer_price[0] if len(md.offer_price) > 0 else None
-    print(md.market, best_bid, best_offer)
+    best_bid = md.bid_side[0] if len(md.bid_side) > 0 else None
+    best_offer = md.offer_side[0] if len(md.offer_side) > 0 else None
+    print(md.market, best_bid.price, best_offer.price)
 
 
-async def app_run(c: MDClient):
+async def app_run(c: FeedClient):
     """
     implement an application run coroutine to and subscribe or
     unsubscribe markets.
@@ -61,6 +61,6 @@ async def app_run(c: MDClient):
 
 if __name__ == "__main__":
     # use default setting
-    client = MDClient(addr=ADDR, key=TOKEN)
+    client = FeedClient(addr=ADDR, key=TOKEN)
     run = asyncio.ensure_future(client.run(app_run, md_print_handler))
     asyncio.get_event_loop().run_until_complete(run)

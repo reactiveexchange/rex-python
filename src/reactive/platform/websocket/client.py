@@ -21,8 +21,8 @@ import websockets
 from typing import AnyStr, Callable
 from websockets.http import Headers
 
-from reactive.platform.fbs.Message import Message
-from reactive.platform.marketdata.marketdata import MarketData
+from reactive.platform.fbs.feed.Message import Message
+from reactive.platform.feed.level2book import Level2Book
 from reactive.platform.websocket.websocket import consume, produce
 
 
@@ -60,7 +60,7 @@ class Client:
     def handler(self):
         return self.__handler
 
-    def register_handler(self, handler: Callable[[MarketData], None]):
+    def register_handler(self, handler: Callable[[Level2Book], None]):
         self.__handler = handler
 
     async def send(self, request):
@@ -95,7 +95,7 @@ class Client:
 
         self.register_handler(handler)
         if self.handler is None:
-            # FIXME: create a specific exprection
+            # FIXME: create a specific exception
             raise RuntimeError("no call back handler for the client")
         async with self.conn as ws:
             consumer_task = asyncio.ensure_future(consume(ws, self._read))
