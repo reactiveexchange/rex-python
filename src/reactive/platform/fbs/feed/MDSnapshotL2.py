@@ -40,22 +40,29 @@ class MDSnapshotL2(object):
         return None
 
     # MDSnapshotL2
-    def Id(self):
+    def FeedId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
+        return 0
+
+    # MDSnapshotL2
+    def Id(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Int64Flags, o + self._tab.Pos)
         return 0
 
     # MDSnapshotL2
     def Flags(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Uint16Flags, o + self._tab.Pos)
         return 0
 
     # MDSnapshotL2
     def BidSide(self, j):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 16
@@ -67,14 +74,14 @@ class MDSnapshotL2(object):
 
     # MDSnapshotL2
     def BidSideLength(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # MDSnapshotL2
     def OfferSide(self, j):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 16
@@ -86,19 +93,20 @@ class MDSnapshotL2(object):
 
     # MDSnapshotL2
     def OfferSideLength(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
-def MDSnapshotL2Start(builder): builder.StartObject(7)
+def MDSnapshotL2Start(builder): builder.StartObject(8)
 def MDSnapshotL2AddSourceTs(builder, sourceTs): builder.PrependInt64Slot(0, sourceTs, 0)
 def MDSnapshotL2AddSource(builder, source): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(source), 0)
 def MDSnapshotL2AddMarket(builder, market): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(market), 0)
-def MDSnapshotL2AddId(builder, id): builder.PrependInt64Slot(3, id, 0)
-def MDSnapshotL2AddFlags(builder, flags): builder.PrependUint16Slot(4, flags, 0)
-def MDSnapshotL2AddBidSide(builder, bidSide): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(bidSide), 0)
+def MDSnapshotL2AddFeedId(builder, feedId): builder.PrependInt32Slot(3, feedId, 0)
+def MDSnapshotL2AddId(builder, id): builder.PrependInt64Slot(4, id, 0)
+def MDSnapshotL2AddFlags(builder, flags): builder.PrependUint16Slot(5, flags, 0)
+def MDSnapshotL2AddBidSide(builder, bidSide): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(bidSide), 0)
 def MDSnapshotL2StartBidSideVector(builder, numElems): return builder.StartVector(16, numElems, 8)
-def MDSnapshotL2AddOfferSide(builder, offerSide): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(offerSide), 0)
+def MDSnapshotL2AddOfferSide(builder, offerSide): builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(offerSide), 0)
 def MDSnapshotL2StartOfferSideVector(builder, numElems): return builder.StartVector(16, numElems, 8)
 def MDSnapshotL2End(builder): return builder.EndObject()

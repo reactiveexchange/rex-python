@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import reactive.platform.fbs.feed.Feed as Feed
+import reactive.platform.fbs.feed.FeedType as FeedType
 import reactive.platform.fbs.feed.MDSnapshotL2 as Ms
 import reactive.platform.fbs.feed.SubReqType as Srt
 
@@ -21,6 +21,7 @@ from typing import List, AnyStr
 
 from reactive.platform.fbs.feed.Body import Body
 from reactive.platform.fbs.feed.FeedRequestReject import FeedRequestReject
+from reactive.platform.fbs.feed.FeedRequestAck import FeedRequestAck
 from reactive.platform.fbs.feed.Message import Message
 
 from reactive.platform.feed.level2book import Level2Book
@@ -59,23 +60,26 @@ class FeedClient(Client):
         self.req_id = 0
 
     async def subscribe(self, markets: List[str], grouping: int = 0,
-                        feed: int = Feed.Feed.Default,
-                        conflation: int = 100,
-                        depth: int = 5):
+                        feed_type: int = FeedType.FeedType.Default,
+                        frequency: int = 1,
+                        depth: int = 10):
         # FIXME: check if market is already subscribed and only subscribe new markets.
         for market in markets:
             self.__subCache[market] = True
         fr = FeedRequest(req_id=str(++self.req_id), grouping=grouping, markets=markets,
-                         sub_req_type=Srt.SubReqType.Subscribe, feed=feed,
-                         conflation=conflation, depth=depth)
+                         sub_req_type=Srt.SubReqType.Subscribe, feed_type=feed_type,
+                         frequency=frequency, depth=depth)
         await self.send(fr.build_feed_request(self.builder))
 
-    async def unsubscribe(self, markets: List[str]):
+    async def unsubscribe(self, markets: List[str], grouping: int = 0,
+                          feed_type: int = FeedType.FeedType.Default,
+                          frequency: int = 1, depth: int = 10):
         for market in markets:
             if market in self.__subCache:
                 self.__subCache[market] = False
-        fr = FeedRequest(req_id=str(++self.req_id), grouping=0, markets=markets,
-                         sub_req_type=Srt.SubReqType.Unsubscribe, feed=Feed.Feed.Default)
+        fr = FeedRequest(req_id=str(++self.req_id), grouping=grouping, markets=markets,
+                         sub_req_type=Srt.SubReqType.Unsubscribe, feed_type=feed_type,
+                         frequency=frequency, depth=depth)
         await self.send(fr.build_feed_request(self.builder))
 
     async def _read(self, buf: AnyStr):
@@ -94,6 +98,10 @@ class FeedClient(Client):
             frr = FeedRequestReject()
             frr.Init(msg.Body().Bytes, msg.Body().Pos)
             print("market data request is rejected", frr.ErrorCode(), frr.ErrorMessage())
+        elif msg.BodyType() == Body.FeedRequestAck:
+            fra = FeedRequestAck()
+            fra.Init(msg.Body().Bytes, msg.Body().Pos)
+            print("feed ack, req_id: ", fra.ReqId(), " feed_id: ", fra.FeedId())
 
     async def run(self, app_run, handler=md_null_handler):
         """

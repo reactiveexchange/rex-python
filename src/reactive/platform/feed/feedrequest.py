@@ -16,7 +16,7 @@
 import flatbuffers
 
 import reactive.platform.fbs.feed.Body as Body
-import reactive.platform.fbs.feed.Feed as Feed
+import reactive.platform.fbs.feed.FeedType as FeedType
 import reactive.platform.fbs.feed.FeedRequest as Fr
 import reactive.platform.fbs.feed.Message as Message
 import reactive.platform.fbs.feed.SubReqType as Srt
@@ -29,16 +29,15 @@ class FeedRequest:
 
     def __init__(self, req_id: str, grouping: int, markets: List[str],
                  sub_req_type: int = Srt.SubReqType.Subscribe,
-                 feed: int = Feed.Feed.Default,
-                 conflation: int = 100,
-                 depth: int = 5):
+                 feed_type: int = FeedType.FeedType.Default,
+                 frequency: int = 1,
+                 depth: int = 10):
         self.req_id = req_id
         self.sub_req_type = sub_req_type
         self.markets = markets
         self.grouping = grouping
-        self.sub_req_type = sub_req_type
-        self.feed = feed
-        self.conflation = conflation
+        self.feed_type = feed_type
+        self.frequency = frequency
         self.depth = depth
 
     def build_feed_request(self, builder: flatbuffers.Builder) -> bytearray:
@@ -56,10 +55,10 @@ class FeedRequest:
         Fr.FeedRequestStart(builder)
         Fr.FeedRequestAddReqId(builder, self.req_id)
         Fr.FeedRequestAddSubReqType(builder, self.sub_req_type)
-        Fr.FeedRequestAddFeed(builder, self.feed)
-        Fr.FeedRequestAddGrouping(builder, self.grouping)
-        Fr.FeedRequestAddConflation(builder, self.conflation)
+        Fr.FeedRequestAddFeedType(builder, self.feed_type)
         Fr.FeedRequestAddDepth(builder, self.depth)
+        Fr.FeedRequestAddGrouping(builder, self.grouping)
+        Fr.FeedRequestAddFrequency(builder, self.frequency)
         Fr.FeedRequestAddMarkets(builder, markets)
         feed_req = Fr.FeedRequestEnd(builder)
 
