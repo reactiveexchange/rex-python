@@ -2,6 +2,6 @@
 
 # namespace: feed
 
-class Feed(object):
+class FeedType(object):
     Default = 0
 

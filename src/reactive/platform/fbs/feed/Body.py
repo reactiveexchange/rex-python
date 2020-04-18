@@ -5,8 +5,9 @@
 class Body(object):
     NONE = 0
     FeedRequest = 1
-    FeedRequestReject = 2
-    MDSnapshotL2 = 3
-    PublicTrade = 4
-    SessionStatus = 5
+    FeedRequestAck = 2
+    FeedRequestReject = 3
+    MDSnapshotL2 = 4
+    PublicTrade = 5
+    SessionStatus = 6
 

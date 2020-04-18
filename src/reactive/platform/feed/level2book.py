@@ -33,7 +33,7 @@ class MDLevel2:
 
 class Level2Book:
 
-    def __init__(self, market: str, flag: int, bid_side: List[MDLevel2],
+    def __init__(self, market: str, feed_id: int, flag: int, bid_side: List[MDLevel2],
                  offer_side: List[MDLevel2], **kwargs):
         """
 
@@ -41,6 +41,10 @@ class Level2Book:
         ----------
         market: str
           market symbol
+        feed_id: int
+            feed_id from server.
+        id: int
+            id for the book.
         flag: int
           bitset describes features of the market-data.
         bid_side: List[MDLevel2]
@@ -50,16 +54,14 @@ class Level2Book:
         kwargs: dict
         """
         self.market = market
+        self.feed_id = feed_id
         self.flag = flag
         self.bid_side = bid_side
         self.offer_side = offer_side
 
-        if "source_ts" in kwargs:
-            self.source_ts = kwargs["source_ts"]
-        if "source" in kwargs:
-            self.source = kwargs["soruce"]
-        if "id" in kwargs:
-            self.id = kwargs["id"]
+        self.source_ts = kwargs["source_ts"] if "source_ts" in kwargs else 0
+        self.source = kwargs["source"] if "source" in kwargs else None
+        self.id = kwargs["id"] if "id" in kwargs else None
 
     @classmethod
     def load_from_flat_buffer(cls, md: MDSnapshotL2):
@@ -73,5 +75,6 @@ class Level2Book:
             level = md.OfferSide(i)
             offer_side.append(MDLevel2(qty=level.Qty(), price=level.Price()))
 
-        return Level2Book(market=md.Market(), flag=md.Flags(), bid_side=bid_side,
-                          offer_side=offer_side)
+        return Level2Book(market=md.Market(), feed_id=md.FeedId(), id=md.Id(), flag=md.Flags(),
+                          bid_side=bid_side, offer_side=offer_side, source_ts=md.SourceTs(),
+                          source=md.Source())
