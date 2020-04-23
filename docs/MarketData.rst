@@ -4,9 +4,9 @@
 MarketData
 ==========
 
-To receive market data from reactive-platform, use `reactive.platform.feed.FeedClient`
-class to set up a websocket connection and consume market data. A `FeedClient` object requires
-a API token and address. The token is issued from the trading platform under account settings:
+To subscribe market data from reactive-platform, use `reactive.platform.feed.FeedClient`
+class to set up a websocket connection and consume data. A `FeedClient` object requires
+a API token and URL. The token is issued from the trading platform UI under account settings:
 
 .. code:: python
 
@@ -17,7 +17,7 @@ a API token and address. The token is issued from the trading platform under acc
     feed_client = FeedClient(addr=addr, key=TOKEN)
 
 
-Before consuming data, create your own callback function to handle market data, and create an
+Before starting subscriptions, creates a callback function to handle market data, and create an
 application coroutine to send market data subscription.
 
 .. code:: python
@@ -40,9 +40,18 @@ application coroutine to send market data subscription.
     unsubscribe markets.
     """
 
-    await c.subscribe(["BTCUSD-CNB"])
+    await c.subscribe(["BTCUSD-CNB"], depth=10, grouping=1)
 
-Then run the application as following:
+
+User can specify book depth and tick grouping values for subscribing markets, to determine different
+view on the market data. Successful subscription will be notified via a feed ack message,
+including a feed_id which is an integer number to represents a book view (depth and grouping),
+and requested id corresponding to the client request. On the other hand, a feed reject message is
+received for a bad subscription. Currently only support depths: [1, 5, 10, 20] and grouping ticks
+with [1, 10, 50, 100]. (Not all the instruments are supported for different grouping yet. Use 1 as
+grouping value at this moment.)
+
+Run the application as following:
 
 .. code:: python
 

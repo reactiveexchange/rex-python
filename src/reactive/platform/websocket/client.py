@@ -29,8 +29,9 @@ from reactive.platform.websocket.websocket import consume, produce
 class Client:
 
     ADDRESS = "wss://api.platform.reactivemarkets.com/stream"
+    IO_TIMEOUT = 2.0
 
-    def __init__(self, addr: str = None, key: str = None):
+    def __init__(self, addr: str = None, key: str = None, close_timeout: float = IO_TIMEOUT):
         """
         Create a web socket client to connect platform.
 
@@ -42,8 +43,9 @@ class Client:
             key represents API key, which is used for verifying identity.
         """
         self.__addr = addr if addr is not None else self.ADDRESS
-        header = Headers(Authorization="Bearer " + key) if key is not None else None
-        self.__conn = websockets.connect(self.__addr, extra_headers=header)
+        self.header = Headers(Authorization="Bearer " + key) if key is not None else None
+        self.close_timeout = close_timeout
+        self.__conn = websockets.connect(self.__addr, extra_headers=self.header)
         self.__builder = flatbuffers.Builder(1400)
         self.__handler = None
         self.__queue = asyncio.Queue(10)
@@ -97,7 +99,8 @@ class Client:
         if self.handler is None:
             # FIXME: create a specific exception
             raise RuntimeError("no call back handler for the client")
-        async with self.conn as ws:
+        try:
+            ws = await asyncio.wait_for(self.__conn, timeout=self.close_timeout)
             consumer_task = asyncio.ensure_future(consume(ws, self._read))
             producer_task = asyncio.ensure_future(produce(ws, self._write))
             asyncio.ensure_future(app_run(self))
@@ -107,3 +110,7 @@ class Client:
             )
             for task in pending:
                 task.cancel()
+        except Exception:
+            raise
+        else:
+            self.__conn.ws_client.close()
