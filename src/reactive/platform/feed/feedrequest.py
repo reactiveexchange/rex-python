@@ -27,14 +27,15 @@ from typing import List
 
 class FeedRequest:
 
-    def __init__(self, req_id: str, grouping: int, markets: List[str],
-                 sub_req_type: int = Srt.SubReqType.Subscribe,
+    def __init__(self, req_id: str, markets: List[str],
                  feed_type: int = FeedType.FeedType.Default,
-                 frequency: int = 1,
-                 depth: int = 10):
+                 depth: int = 10,
+                 grouping: int = 1,
+                 sub_req_type: int = Srt.SubReqType.Subscribe,
+                 frequency: int = 1):
         self.req_id = req_id
-        self.sub_req_type = sub_req_type
         self.markets = markets
+        self.sub_req_type = sub_req_type
         self.grouping = grouping
         self.feed_type = feed_type
         self.frequency = frequency

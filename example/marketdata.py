@@ -20,8 +20,8 @@ from reactive.platform.feed.level2book import Level2Book
 
 MARKET_LIST = ["EURUSD-REX", "EURGBP-REX", "EURCHF-REX", "EURRON-REX", "USDCAD-REX",
                "USDCHF-REX", "USDJPY-REX", "USDCHF-REX", "EURJPY-REX", "AUDUSD-REX",
-               "BCHUSD-BFN", "BTCUSD-BFN", "ETHUSD-BFN", "LTCUSD-BFN", "XRPUSD-BFN",
-               "BCHUSD-BIN", "BTCUSD-BIN", "ETHUSD-BIN", "LTCUSD-BIN", "XRPUSD-BIN",
+               "BTCUSD-BFN", "ETHUSD-BFN", "LTCUSD-BFN", "XRPUSD-BFN",
+               "BCHUSDT-BIN", "BTCUSDT-BIN", "ETHUSDT-BIN", "LTCUSDT-BIN", "XRPUSDT-BIN",
                "BCHUSD-CNB", "BTCUSD-CNB", "ETHUSD-CNB", "LTCUSD-CNB", "XRPUSD-CNB"]
 TOKEN = ""
 ADDR = "wss://api.platform.reactivemarkets.com/feed"
@@ -48,19 +48,20 @@ async def app_run(c: FeedClient):
     """
 
     # unknown markets, expect an reject message
-    await c.subscribe(["BTCUSD-CME"])
+    await c.subscribe(["BTCUSD-CME"], depth=10, grouping=1)
     while True:
         market = random_market()
         print("sub", market)
-        await c.subscribe([market])
+        await c.subscribe([market], depth=0, grouping=0)
+        await c.subscribe([market], depth=5)
         await asyncio.sleep(3)
         print("unsub", market)
-        await c.unsubscribe([market])
+        await c.unsubscribe([market], depth=0, grouping=0)
+        await c.unsubscribe([market], depth=5)
         await asyncio.sleep(1)
 
 
 if __name__ == "__main__":
-    # use default setting
-    client = FeedClient(addr=ADDR, key=TOKEN)
+    client = FeedClient(addr=ADDR, key=TOKEN, close_timeout=1.0)
     run = asyncio.ensure_future(client.run(app_run, md_print_handler))
     asyncio.get_event_loop().run_until_complete(run)

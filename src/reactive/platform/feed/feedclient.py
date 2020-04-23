@@ -45,7 +45,7 @@ class FeedClient(Client):
 
     ADDRESS = 'wss://api.platform.reactivemarkets.com/feed'
 
-    def __init__(self, addr: str = None, key: str = None):
+    def __init__(self, addr: str = None, key: str = None, close_timeout: float = 2.0):
         """
         Parameters
         ----------
@@ -53,16 +53,20 @@ class FeedClient(Client):
             web socket server address
         key: str
             platform API token.
+        close_timeout : float
+            maximum wait time in seconds for completing the closing handshake and terminating
+            the TCP connection.
         """
         addr = addr if addr is not None else self.ADDRESS
-        super().__init__(key=key, addr=addr)
+        super().__init__(key=key, addr=addr, close_timeout=close_timeout)
         self.__subCache = dict()
         self.req_id = 0
 
-    async def subscribe(self, markets: List[str], grouping: int = 0,
+    async def subscribe(self, markets: List[str],
                         feed_type: int = FeedType.FeedType.Default,
-                        frequency: int = 1,
-                        depth: int = 10):
+                        depth: int = 10,
+                        grouping: int = 1,
+                        frequency: int = 1):
         # FIXME: check if market is already subscribed and only subscribe new markets.
         for market in markets:
             self.__subCache[market] = True
@@ -71,9 +75,10 @@ class FeedClient(Client):
                          frequency=frequency, depth=depth)
         await self.send(fr.build_feed_request(self.builder))
 
-    async def unsubscribe(self, markets: List[str], grouping: int = 0,
+    async def unsubscribe(self, markets: List[str],
                           feed_type: int = FeedType.FeedType.Default,
-                          frequency: int = 1, depth: int = 10):
+                          depth: int = 10, grouping: int = 1,
+                          frequency: int = 1):
         for market in markets:
             if market in self.__subCache:
                 self.__subCache[market] = False
