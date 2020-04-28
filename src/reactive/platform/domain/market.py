@@ -22,7 +22,7 @@ from reactive.platform.domain.util import convert
 
 class Market:
 
-    def __init__(self, symbol="", display="", description="", instr="", venue="", stream_id=0,
+    def __init__(self, symbol="", display="", description="", instr="", venue="", source_id=0,
                  expiry_date=0, default_lots=0, lot_numer=0, lot_denom=0, tick_numer=0,
                  tick_denom=0, price_dp=0, **kwargs):
         self.symbol = convert(symbol, str)
@@ -30,7 +30,7 @@ class Market:
         self.description = convert(description, str)
         self.instr = convert(instr, str)
         self.venue = convert(venue, str)
-        self.stream_id = convert(stream_id, int)
+        self.source_id = convert(source_id, int)
         self.expiry_date = convert(expiry_date, int)
         self.default_lots = convert(default_lots, int)
         self.lot_numer = convert(lot_numer, int)
@@ -45,7 +45,7 @@ class Market:
                f"Description:'{self.description}'," + \
                f"Instr:'{self.instr}'," + \
                f"Venue:'{self.venue}'," + \
-               f"StreamID:{self.stream_id}," + \
+               f"SourceID:{self.source_id}," + \
                f"ExpiryDate:{self.expiry_date}," + \
                f"DefaultLots:{self.default_lots}," + \
                f"LotNumer:{self.lot_numer}," + \

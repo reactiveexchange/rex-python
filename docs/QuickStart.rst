@@ -4,15 +4,15 @@
 Quickstart
 ==========
 
-To use reactive-platform package to access reactive platform, a API token must be used,
-and it can be created from the trading platform under account settings.
+The Reactive Platform API for python.
 
 ----------------
-Create Client
+Rest API Client
 ----------------
 
-`Client` represents a client class, and a user must to create a client first with
-API key and platform address.
+A API token for a client must be generated first from the trading platform under account settings.
+
+Create a Rest API `Client` with the token and platform address.
 
 .. code:: python
 
@@ -46,7 +46,7 @@ Reference data includes asset, instrument, venue and markets.
 
 The refData objects have methods: `to_json` and `to_dict` to get a json string or python dict.
 
-If client use pandas locally, the reference data can be viewed as a Dataframe table in jupyter-note
+If client uses pandas locally, the reference data can be viewed in a Dataframe table in jupyter-note
 book:
 
 .. code:: python

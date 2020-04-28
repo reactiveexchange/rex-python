@@ -100,11 +100,11 @@ class VenueRefDataTestCase(unittest.TestCase):
 
 class MarketRefDataTestCase(unittest.TestCase):
     market_str = '[{"symbol": "XRPUSD-BIN", "display": "XRP/USD", "description": "Ripple", ' \
-                 '"instr": "XRPUSD", "venue": "BIN", "stream_id": 983041, "expiry_date": 0, ' \
+                 '"instr": "XRPUSD", "venue": "BIN", "source_id": 983041, "expiry_date": 0, ' \
                  '"default_lots": 1, "lot_numer": 1, "lot_denom": 1, "tick_numer": 1, ' \
                  '"tick_denom": 100000, "price_dp": 5}, {"symbol": "XTSUSD-REX", "display": ' \
                  '"XTS/USD", "description": "Test Instrument", "instr": "XTSUSD", "venue": ' \
-                 '"REX", "stream_id": 65537, "expiry_date": 0, "default_lots": 1000000, ' \
+                 '"REX", "source_id": 65537, "expiry_date": 0, "default_lots": 1000000, ' \
                  '"lot_numer": 1, "lot_denom": 1, "tick_numer": 1, "tick_denom": 10000, ' \
                  '"price_dp": 4}]'
 
@@ -120,7 +120,7 @@ class MarketRefDataTestCase(unittest.TestCase):
         self.assertEqual(market.description, "Test Instrument")
         self.assertEqual(market.instr, "XTSUSD")
         self.assertEqual(market.venue, "REX")
-        self.assertEqual(market.stream_id, 65537)
+        self.assertEqual(market.source_id, 65537)
         self.assertEqual(market.expiry_date, 0)
         self.assertEqual(market.default_lots, 1000000)
         self.assertEqual(market.lot_numer, 1)
