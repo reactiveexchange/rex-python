@@ -70,7 +70,8 @@ class FeedClient(Client):
         # FIXME: check if market is already subscribed and only subscribe new markets.
         for market in markets:
             self.__subCache[market] = True
-        fr = FeedRequest(req_id=str(++self.req_id), grouping=grouping, markets=markets,
+        self.req_id += 1
+        fr = FeedRequest(req_id=str(self.req_id), grouping=grouping, markets=markets,
                          sub_req_type=Srt.SubReqType.Subscribe, feed_type=feed_type,
                          frequency=frequency, depth=depth)
         await self.send(fr.build_feed_request(self.builder))
@@ -82,7 +83,8 @@ class FeedClient(Client):
         for market in markets:
             if market in self.__subCache:
                 self.__subCache[market] = False
-        fr = FeedRequest(req_id=str(++self.req_id), grouping=grouping, markets=markets,
+        self.req_id += 1
+        fr = FeedRequest(req_id=str(self.req_id), grouping=grouping, markets=markets,
                          sub_req_type=Srt.SubReqType.Unsubscribe, feed_type=feed_type,
                          frequency=frequency, depth=depth)
         await self.send(fr.build_feed_request(self.builder))

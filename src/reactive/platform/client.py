@@ -34,7 +34,7 @@ from reactive.platform.util.cache import Cached
 
 class Client(metaclass=Cached):
     """
-    Client represents client object to access reactive exchange platform.
+    Client represents client object to access reactive exchange platform via Rest API.
     """
 
     URL = "https://api.platform.reactivemarkets.com"

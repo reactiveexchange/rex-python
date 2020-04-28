@@ -47,6 +47,7 @@ class FeedRequest:
         size = len(self.markets)
         for market in self.markets:
             build_market.append(builder.CreateString(market))
+        req_id_string = builder.CreateString(self.req_id)
 
         Fr.FeedRequestStartMarketsVector(builder, size)
         for b in reversed(build_market):
@@ -54,7 +55,7 @@ class FeedRequest:
         markets = builder.EndVector(size)
 
         Fr.FeedRequestStart(builder)
-        Fr.FeedRequestAddReqId(builder, self.req_id)
+        Fr.FeedRequestAddReqId(builder, req_id_string)
         Fr.FeedRequestAddSubReqType(builder, self.sub_req_type)
         Fr.FeedRequestAddFeedType(builder, self.feed_type)
         Fr.FeedRequestAddDepth(builder, self.depth)

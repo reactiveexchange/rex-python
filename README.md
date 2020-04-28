@@ -1,83 +1,102 @@
 # Reactive-Platform Python
 
+The Reactive Platform API for Python.
+
 ## Getting Started
 
-Start by creating a virtual environment and installing required packages:
+### Install
+
+The package only support python3.7 and python3.8, not for lower versions.
+
+Install the package in a python environment:
 
 ```bash
-$ python3 -m venv venv
-$ source venv/bin/activate
-$ pip install -r requirements.txt
+$ pip install reactive-platform
 ```
 
-Run the tests:
+Uninstall the package:
 
 ```bash
-$ python setup.py test
+$ pip uninstall reactive-platform
 ```
 
-Deactivate the virtual environment when you are done:
+### Using REST API
 
-```bash
-$ deactivate
+The REST API has endpoints for different type data, e.g. orders, analytics and references.
+At this moment, this packages only supports reference data. To access the platform, a API
+token must be granted from platform UI.
+
+### Create a REST client
+
+Create a client first:
+
+```python
+from reactive.platform.client import Client
+
+key = 'xxx'
+url = "https://api.platform.reactivemarkets.com"
+rc = Client(url=url, key=key)
+
 ```
 
-## Upgrade Dependencies
+### Reference Data
 
-Dependencies can be upgraded as follows:
+Reference data includes asset, instrument, venue and markets. Get those data:
 
-```bash
-$ pip install pip-tools
-$ pip-compile requirements.in >requirements.txt
-$ pip install -r requirements.txt
+```python
+
+asset_ref = rc.fetch_asset_ref_data()
+assets = asset_ref.to_json(indent=None)
+asset_dict = asset_ref.to_dict()
+
+instr_ref = rc.fetch_instr_ref_data()
+instrs = instr_ref.to_json()
+
+venue_ref = rc.fetch_venue_ref_data()
+venues = venue_ref.to_json()
+
+market_ref = rc.fetch_market_ref_data()
+markets = market_ref.to_json()
+
 ```
 
-## Testing
+If client uses pandas locally, the reference data can be viewed in a Dataframe table in jupyter-note
+book:
 
-Run the tests:
+```python
+import pandas as pd
 
-```bash
-$ python setup.py test
+df = pd.read_json(market_ref.to_json())
+df
 ```
 
-Run nosestests:
+## Feed Gateway WekSocket API
 
-```bash
-$ pip install coverage flake8 nose pylint
-$ python setup.py nosetests
+The websocket feed provides real-time level 2 market data snapshots and public trades via
+
+```angular2
+wss://api.platform.reactivemarkets.com/feed
 ```
 
-Generate coverage report:
+### Create an FeedClient
 
-```bash
-$ python setup.py nosetests --cover-html --cover-html-dir=DIR
+To access feed gateway via web socket, create an FeedClient which manages the web socket connection
+and provides methods to access the gateway.
+
+```python
+from reactive.platform.feed.feedclient import FeedClient
+
+TOKEN = 'xxx'
+addr = "wss://api.platform.reactivemarkets.com/feed"
+feed_client = FeedClient(addr=addr, key=TOKEN)
 ```
 
-Run tox:
+Use `feed_client` to subscribe market data, see a full example in
+`example/marketdata.py`. The client can specify book view parameters in the request. Currently,
+the feed gateway supports, book depths (1, 5, 10, 20), tick grouping (1, 50) and frequency
+(100ms).
 
-```bash
-$ pip install tox
-$ tox
-```
-
-## Installation
-
-Install locally:
-
-```bash
-$ pip install .
-```
-
-## Build Python Package
-
-Build Python package:
-
-```bash
-$ python setup.py sdist
-```
-
-Build wheel:
-
-```bash
-$ python setup.py bdist_wheel
-```
+The message protocol via feed gateway is Flatbuffers, which provides an efficient
+serialization/deserializaton mechanism in terms of both processing and space requirements.
+The reactive-platform generated python classes Flatbuffer schema are located under
+`reactive.platform.fbs`.
