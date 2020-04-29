@@ -29,14 +29,14 @@ class FeedRequest(object):
     def SubReqType(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
+            return self._tab.Get(flatbuffers.number_types.Int16Flags, o + self._tab.Pos)
         return 1
 
     # FeedRequest
     def FeedType(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
+            return self._tab.Get(flatbuffers.number_types.Int16Flags, o + self._tab.Pos)
         return 0
 
     # FeedRequest
@@ -77,8 +77,8 @@ class FeedRequest(object):
 
 def FeedRequestStart(builder): builder.StartObject(7)
 def FeedRequestAddReqId(builder, reqId): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(reqId), 0)
-def FeedRequestAddSubReqType(builder, subReqType): builder.PrependInt8Slot(1, subReqType, 1)
-def FeedRequestAddFeedType(builder, feedType): builder.PrependInt8Slot(2, feedType, 0)
+def FeedRequestAddSubReqType(builder, subReqType): builder.PrependInt16Slot(1, subReqType, 1)
+def FeedRequestAddFeedType(builder, feedType): builder.PrependInt16Slot(2, feedType, 0)
 def FeedRequestAddDepth(builder, depth): builder.PrependUint8Slot(3, depth, 0)
 def FeedRequestAddGrouping(builder, grouping): builder.PrependUint16Slot(4, grouping, 0)
 def FeedRequestAddFrequency(builder, frequency): builder.PrependInt32Slot(5, frequency, 0)
