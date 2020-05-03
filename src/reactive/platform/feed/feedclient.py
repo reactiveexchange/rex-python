@@ -17,7 +17,7 @@ import reactive.platform.fbs.feed.FeedType as FeedType
 import reactive.platform.fbs.feed.MDSnapshotL2 as Ms
 import reactive.platform.fbs.feed.SubReqType as Srt
 
-from typing import List, AnyStr
+from typing import List, AnyStr, Callable
 
 from reactive.platform.fbs.feed.Body import Body
 from reactive.platform.fbs.feed.FeedRequestReject import FeedRequestReject
@@ -95,12 +95,13 @@ class FeedClient(Client):
         and fbs.Feed.FeedRequestReject. If Message is fbs.Feed.MDSnapshotL2, convert into Level2Book
         object, and call the callback handler, which accepts Level2Book object.
         """
+        # TODO: change _read method to a decorator
         msg = Message.GetRootAsMessage(buf, 0)
         if msg.BodyType() == Body.MDSnapshotL2:
             fbs_md = Ms.MDSnapshotL2()
             fbs_md.Init(msg.Body().Bytes, msg.Body().Pos)
             md = Level2Book.load_from_flat_buffer(fbs_md)
-            self.handler(md)
+            self.data_handler(md)
         elif msg.BodyType() == Body.FeedRequestReject:
             frr = FeedRequestReject()
             frr.Init(msg.Body().Bytes, msg.Body().Pos)
@@ -110,9 +111,10 @@ class FeedClient(Client):
             fra.Init(msg.Body().Bytes, msg.Body().Pos)
             print("feed ack, req_id: ", fra.ReqId(), " feed_id: ", fra.FeedId())
 
-    async def run(self, app_run, handler=md_null_handler):
+    async def run(self, request_handler,
+                  data_handler: Callable[[Level2Book], None] = md_null_handler):
         """
         FeedClient expects handler callback method accept Level2Book object like
         handler(Level2Book), instead of handler(fbs.Message) in base Client.
         """
-        await super().run(app_run, handler)
+        await super().run(request_handler=request_handler, data_handler=data_handler)

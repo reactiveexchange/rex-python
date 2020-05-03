@@ -36,19 +36,20 @@ def md_print_handler(md: Level2Book):
     """
     implement a market data callback handler to print best bid and offer.
     """
-    best_bid = md.bid_side[0] if len(md.bid_side) > 0 else None
-    best_offer = md.offer_side[0] if len(md.offer_side) > 0 else None
-    print(md.market, best_bid.price, best_offer.price)
+    best_bid = md.bid_price[0] if md.bid_price.size > 0 else None
+    best_offer = md.offer_price[0] if md.offer_price.size > 0 else None
+    print(md.market, best_bid, best_offer)
 
 
-async def app_run(c: FeedClient):
+async def request_handler(c: FeedClient):
     """
-    implement an application run coroutine to and subscribe or
+    implement an application request_handler coroutine to and subscribe or
     unsubscribe markets.
     """
 
     # unknown markets, expect an reject message
     await c.subscribe(["BTCUSD-CME"], depth=10, grouping=1)
+
     while True:
         market = random_market()
         print("sub", market)
@@ -61,7 +62,12 @@ async def app_run(c: FeedClient):
         await asyncio.sleep(1)
 
 
-if __name__ == "__main__":
+def run():
     client = FeedClient(addr=ADDR, key=TOKEN, close_timeout=1.0)
-    run = asyncio.ensure_future(client.run(app_run, md_print_handler))
+    run = asyncio.ensure_future(client.run(request_handler=request_handler,
+                                           data_handler=md_print_handler))
     asyncio.get_event_loop().run_until_complete(run)
+
+
+if __name__ == "__main__":
+    run()

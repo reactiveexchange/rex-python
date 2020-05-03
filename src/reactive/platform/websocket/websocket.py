@@ -21,7 +21,8 @@ from typing import Callable, AnyStr, Coroutine
 
 async def consume(ws: websockets.WebSocketClientProtocol, handler: Callable[[AnyStr], Coroutine]):
     """
-    consumer read data from web socket and handle the message via callback function handler
+    Read data from web socket and handle the message via callback function handler.
+    Running consume in a task or future.
     """
     async for message in ws:
         await handler(message)

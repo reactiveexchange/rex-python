@@ -47,7 +47,7 @@ class PublicTrade(object):
         return 0
 
     # PublicTrade
-    def Id(self):
+    def TradeId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
@@ -93,7 +93,7 @@ def PublicTradeAddSourceTs(builder, sourceTs): builder.PrependInt64Slot(0, sourc
 def PublicTradeAddSource(builder, source): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(source), 0)
 def PublicTradeAddMarket(builder, market): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(market), 0)
 def PublicTradeAddFeedId(builder, feedId): builder.PrependInt32Slot(3, feedId, 0)
-def PublicTradeAddId(builder, id): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(id), 0)
+def PublicTradeAddTradeId(builder, tradeId): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(tradeId), 0)
 def PublicTradeAddFlags(builder, flags): builder.PrependUint16Slot(5, flags, 0)
 def PublicTradeAddSide(builder, side): builder.PrependInt16Slot(6, side, 0)
 def PublicTradeAddQty(builder, qty): builder.PrependFloat64Slot(7, qty, 0.0)

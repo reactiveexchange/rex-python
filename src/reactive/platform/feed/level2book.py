@@ -19,62 +19,120 @@ Level 2 order book data structures.
 
 """
 
-from typing import List
+import numpy as np
+import pandas as pd
 
+from math import isclose
 from reactive.platform.fbs.feed.MDSnapshotL2 import MDSnapshotL2
-
-
-class MDLevel2:
-
-    def __init__(self, qty, price):
-        self.qty = qty
-        self.price = price
 
 
 class Level2Book:
 
-    def __init__(self, market: str, feed_id: int, flag: int, bid_side: List[MDLevel2],
-                 offer_side: List[MDLevel2], **kwargs):
+    def __init__(self, market: str,
+                 bid_price: np.array,
+                 bid_qty: np.array,
+                 offer_price: np.array,
+                 offer_qty: np.array,
+                 feed_id: int = 0,
+                 flag: int = 0,
+                 source_ts: int = 0,
+                 source: str = None,
+                 id: int = None,
+                 **kwargs):
         """
 
         Parameters
         ----------
         market: str
           market symbol
+
+        bid_price: np.array[float64]
+            Bid price array.
+        bid_qty: np.array[float64]
+            Bid qty np.array.
+        offer_price: np.array[float64]
+            Offer price np.array.
+        offer_qty: np.array[float64]
+            Offer qty np.array.
         feed_id: int
-            feed_id from server.
-        id: int
-            id for the book.
+            A unique identifier for a feed view, assigned by server.
+        id: int, default None
+            Unique book integer identifier, only unique per market and feed_id, not across platfrom.
+            default None means id is not specified.
         flag: int
-          bitset describes features of the market-data.
-        bid_side: List[MDLevel2]
-          bid side of the book
-        offer_side: List[MDLevel2]
-          offer side of the book
-        kwargs: dict
+          Bitset describes features of the market-data.
+        source_ts : int
+          Source timestamp in nanosecond.
+        source: str
+          Source string.
         """
         self.market = market
         self.feed_id = feed_id
         self.flag = flag
-        self.bid_side = bid_side
-        self.offer_side = offer_side
+        self.source_ts = source_ts
+        self.source = source
+        self.id = id
 
-        self.source_ts = kwargs["source_ts"] if "source_ts" in kwargs else 0
-        self.source = kwargs["source"] if "source" in kwargs else None
-        self.id = kwargs["id"] if "id" in kwargs else None
+        self.bid_price = bid_price
+        self.bid_qty = bid_qty
+        self.offer_price = offer_price
+        self.offer_qty = offer_qty
+
+    def to_df(self) -> pd.DataFrame:
+        """
+        Convert order book into a pandas DataFrame.
+        """
+        df = pd.DataFrame(data={"bid_qty": self.bid_qty,
+                                "bid_price": self.bid_price,
+                                "offer_price": self.offer_price,
+                                "offer_qty": self.offer_price})
+        return df
+
+    def bid_depth(self):
+        depth = 0
+        for qty in self.bid_qty:
+            if qty < 0 or isclose(qty, 0.0):
+                break
+            depth += 1
+        return depth
+
+    def offer_depth(self):
+        depth = 0
+        for qty in self.offer_qty:
+            if qty < 0 or isclose(qty, 0.0):
+                break
+            depth += 1
+        return depth
+
+    def is_empty(self) -> bool:
+        if self.bid_depth() == 0 and self.offer_depth() == 0:
+            return True
+        return False
 
     @classmethod
     def load_from_flat_buffer(cls, md: MDSnapshotL2):
-        bid_side = list()
+        bid_length = md.BidSideLength()
+        bid_price = np.zeros(bid_length, dtype=np.float64)
+        bid_qty = np.zeros(bid_length, dtype=np.float64)
         for i in range(0, md.BidSideLength()):
             level = md.BidSide(i)
-            bid_side.append(MDLevel2(qty=level.Qty(), price=level.Price()))
-
-        offer_side = list()
+            bid_price[i] = level.Price()
+            bid_qty[i] = level.Qty()
+        offer_length = md.OfferSideLength()
+        offer_price = np.zeros(offer_length, dtype=np.float64)
+        offer_qty = np.zeros(offer_length, dtype=np.float64)
         for i in range(0, md.OfferSideLength()):
             level = md.OfferSide(i)
-            offer_side.append(MDLevel2(qty=level.Qty(), price=level.Price()))
+            offer_price[i] = level.Price()
+            offer_qty[i] = level.Qty()
 
-        return Level2Book(market=md.Market(), feed_id=md.FeedId(), id=md.Id(), flag=md.Flags(),
-                          bid_side=bid_side, offer_side=offer_side, source_ts=md.SourceTs(),
+        return Level2Book(market=md.Market(),
+                          bid_price=bid_price,
+                          bid_qty=bid_qty,
+                          offer_price=offer_price,
+                          offer_qty=offer_qty,
+                          feed_id=md.FeedId(),
+                          id=md.Id(),
+                          flag=md.Flags(),
+                          source_ts=md.SourceTs(),
                           source=md.Source())

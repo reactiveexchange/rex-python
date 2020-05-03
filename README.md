@@ -23,7 +23,7 @@ $ pip uninstall reactive-platform
 ### Using REST API
 
 The REST API has endpoints for different type data, e.g. orders, analytics and references.
-At this moment, this packages only supports reference data. To access the platform, a API
+At this moment, this package only supports querying reference data. To access the platform, a API
 token must be granted from platform UI.
 
 ### Create a REST client
@@ -31,7 +31,7 @@ token must be granted from platform UI.
 Create a client first:
 
 ```python
-from reactive.platform.client import Client
+from reactive.platform.rest.client import Client
 
 key = 'xxx'
 url = "https://api.platform.reactivemarkets.com"
@@ -44,24 +44,32 @@ rc = Client(url=url, key=key)
 Reference data includes asset, instrument, venue and markets. Get those data:
 
 ```python
+asset_ref = rc.fetch_asset_ref()
+# json format assets reference data
+assets = asset_ref.to_json()
+print("asset reference:\n", assets)
+# dict format assets
+assets_dict = asset_ref.to_dict()
+print("assets dict:\n", assets)
 
-asset_ref = rc.fetch_asset_ref_data()
-assets = asset_ref.to_json(indent=None)
-asset_dict = asset_ref.to_dict()
-
-instr_ref = rc.fetch_instr_ref_data()
+# instr reference
+instr_ref = rc.fetch_instr_ref()
 instrs = instr_ref.to_json()
+print("instrument reference:\n", instrs)
 
-venue_ref = rc.fetch_venue_ref_data()
+# venue reference
+venue_ref = rc.fetch_venue_ref()
 venues = venue_ref.to_json()
+print("venue reference:\n", venues)
 
-market_ref = rc.fetch_market_ref_data()
+# market reference
+market_ref = rc.fetch_market_ref()
 markets = market_ref.to_json()
+print("market reference:\n", venues)
 
 ```
 
-If client uses pandas locally, the reference data can be viewed in a Dataframe table in jupyter-note
-book:
+If client uses pandas, the reference data can be viewed in a Dataframe table in jupyter-notebook:
 
 ```python
 import pandas as pd

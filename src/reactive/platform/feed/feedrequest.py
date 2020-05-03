@@ -26,7 +26,9 @@ from typing import List
 
 
 class FeedRequest:
-
+    """
+    FeedRequest class is responsible for creating a feed.FeedRequest flatbuffer message.
+    """
     def __init__(self, req_id: str, markets: List[str],
                  feed_type: int = FeedType.FeedType.Default,
                  depth: int = 10,
