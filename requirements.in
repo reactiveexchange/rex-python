@@ -1,4 +1,6 @@
 flatbuffers
-pytz
-requests
-websockets
+pytz==2020.1
+requests==2.23.0
+websockets==8.1
+numpy >=1.15.4
+pandas==1.0.3

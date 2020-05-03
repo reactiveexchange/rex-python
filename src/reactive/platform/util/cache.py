@@ -25,6 +25,10 @@ from weakref import WeakValueDictionary
 
 
 class Cached(type):
+    """
+    Metaclass Hook for Cached instances of a class type.
+    The same inputs of `__init__`  method will return the same object from cache.
+    """
 
     def __init__(cls, *args, **kwargs):
         super().__init__(*args, **kwargs)

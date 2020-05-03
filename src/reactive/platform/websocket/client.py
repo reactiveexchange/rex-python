@@ -22,7 +22,6 @@ from typing import AnyStr, Callable
 from websockets.http import Headers
 
 from reactive.platform.fbs.feed.Message import Message
-from reactive.platform.feed.level2book import Level2Book
 from reactive.platform.websocket.websocket import consume, produce
 
 
@@ -47,7 +46,7 @@ class Client:
         self.close_timeout = close_timeout
         self.__conn = websockets.connect(self.__addr, extra_headers=self.header)
         self.__builder = flatbuffers.Builder(1400)
-        self.__handler = None
+        self.__data_handler = None
         self.__queue = asyncio.Queue(10)
 
     @property
@@ -59,20 +58,20 @@ class Client:
         return self.__builder
 
     @property
-    def handler(self):
-        return self.__handler
+    def data_handler(self):
+        return self.__data_handler
 
-    def register_handler(self, handler: Callable[[Level2Book], None]):
-        self.__handler = handler
+    def register_data_handler(self, handler: Callable[[bytearray], None]):
+        self.__data_handler = handler
 
     async def send(self, request):
         """
-        send sends request to server.
+        Sends a request message to server.
 
         Parameters
         ----------
         request: fbs.Message
-          request message
+          feed.Message with feed request
         """
         await self.__queue.put(request)
 
@@ -80,30 +79,42 @@ class Client:
         """
         _read decode message into fbs.Message and call callback handler.
         """
+        # TODO: change _read method to a decorator
         msg = Message.GetRootAsMessage(buf, 0)
-        self.__handler(msg)
+        self.__data_handler(msg)
 
     async def _write(self):
         return await self.__queue.get()
 
-    async def run(self, app_run, handler=None):
+    async def run(self, request_handler, data_handler: Callable[[Message], None] = None):
         """
-        client run method, will trigger three asyncio tasks running on event loop. Consumer_task is
-        reading data from web socket and trigged the callback handler, the second producer_task is
-        reading from internal request queue and send to server, and the last task is the app_run
-        which is user implemented coroutine has a contact like `func(Client)`. In app_run, user
-        has right to re-assign callback handler, and send requests via `send` method.
-        """
+        run coroutine will trigger three asyncio futures running on event loop. The Consumer_task
+        is reading data from web socket and trigger the user defined callback handler, the second
+        producer_task is reading from internal request queue and send requests to server, and the
+        last task is the request_handler which is user implemented coroutine has a contact:
+        `func(Client)`.
 
-        self.register_handler(handler)
-        if self.handler is None:
-            # FIXME: create a specific exception
-            raise RuntimeError("no call back handler for the client")
+        Parameters
+        ----------
+        request_handler : callable[[Client], None]
+            request_handler is a user defined coroutine, which will be wrapped into a future,
+            and running with consume / produce futures together in the event_loop.
+            In the request_handler, user can send request messages via `send` method, or execute
+            any expressions.
+
+        data_handler: callable[[Any], None]
+            callback handler handles message read from web sockets.
+
+        """
+        if data_handler is not None:
+            self.register_data_handler(data_handler)
+        if self.__data_handler is None:
+            raise RuntimeError("no call back data handler for the client")
         try:
             ws = await asyncio.wait_for(self.__conn, timeout=self.close_timeout)
             consumer_task = asyncio.ensure_future(consume(ws, self._read))
             producer_task = asyncio.ensure_future(produce(ws, self._write))
-            asyncio.ensure_future(app_run(self))
+            asyncio.ensure_future(request_handler(self))
             done, pending = await asyncio.wait(
                 [consumer_task, producer_task],
                 return_when=asyncio.FIRST_COMPLETED,

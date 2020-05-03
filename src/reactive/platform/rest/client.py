@@ -24,24 +24,25 @@ the platform via python. Accessed data includes reference, trading data and even
 import os
 import requests
 
-from reactive.platform.constant import ASSET_PATH, INSTR_PATH, VENUE_PATH, MARKET_PATH
+from reactive.platform.rest.constant import ASSET_PATH, INSTR_PATH, VENUE_PATH, MARKET_PATH
 from reactive.platform.domain.asset import AssetRefData
 from reactive.platform.domain.instr import InstrRefData
 from reactive.platform.domain.market import MarketRefData
 from reactive.platform.domain.venue import VenueRefData
 from reactive.platform.util.cache import Cached
+from reactive.platform.util.error import TokenNotFound
 
 
 class Client(metaclass=Cached):
     """
-    Client represents client object to access reactive exchange platform via Rest API.
+    Client represents a client to access reactive exchange platform via Rest API.
     """
 
     URL = "https://api.platform.reactivemarkets.com"
 
     def __init__(self, url: str = None, key: str = None):
         """
-        Create RexClient.
+        Create Client.
 
         Parameters
         ----------
@@ -52,12 +53,12 @@ class Client(metaclass=Cached):
         """
         key = key if key is not None else os.getenv("REACTIVE_API_TOKEN")
         if key is None:
-            raise RuntimeError("no API key found")
+            raise TokenNotFound("API key not found")
 
         self.__headers = {'Authorization': 'Bearer ' + key}
         self.__url = url if url is not None else self.URL
 
-    def fetch_asset_ref_data(self):
+    def fetch_asset_ref(self) -> AssetRefData:
         """
         Fetch asset reference data.
 
@@ -68,7 +69,7 @@ class Client(metaclass=Cached):
         r = requests.get(self.__url + ASSET_PATH, headers=self.__headers)
         return AssetRefData.load_from_list(list(r.json()))
 
-    def fetch_instr_ref_data(self):
+    def fetch_instr_ref(self) -> InstrRefData:
         """
         Fetch instrument reference data.
 
@@ -79,7 +80,7 @@ class Client(metaclass=Cached):
         r = requests.get(self.__url + INSTR_PATH, headers=self.__headers)
         return InstrRefData.load_from_list(instrs=list(r.json()))
 
-    def fetch_venue_ref_data(self):
+    def fetch_venue_ref(self) -> VenueRefData:
         """
         Fetch venue reference data.
 
@@ -90,7 +91,7 @@ class Client(metaclass=Cached):
         r = requests.get(self.__url + VENUE_PATH, headers=self.__headers)
         return VenueRefData.load_from_list(venues=list(r.json()))
 
-    def fetch_market_ref_data(self):
+    def fetch_market_ref(self) -> MarketRefData:
         """
         Fetch market reference data, and market is instrument unique per venue.
 
