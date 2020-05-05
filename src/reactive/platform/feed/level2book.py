@@ -38,6 +38,7 @@ class Level2Book:
                  source_ts: int = 0,
                  source: str = None,
                  id: int = None,
+                 depth: int = 0,
                  **kwargs):
         """
 
@@ -72,6 +73,7 @@ class Level2Book:
         self.source_ts = source_ts
         self.source = source
         self.id = id
+        self.depth = depth
 
         self.bid_price = bid_price
         self.bid_qty = bid_qty
@@ -133,6 +135,7 @@ class Level2Book:
                           offer_qty=offer_qty,
                           feed_id=md.FeedId(),
                           id=md.Id(),
+                          depth=md.Depth(),
                           flag=md.Flags(),
                           source_ts=md.SourceTs(),
                           source=md.Source())
