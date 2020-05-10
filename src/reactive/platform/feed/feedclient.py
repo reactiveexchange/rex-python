@@ -13,24 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import reactive.platform.fbs.feed.FeedType as FeedType
-import reactive.platform.fbs.feed.MDSnapshotL2 as Ms
-import reactive.platform.fbs.feed.SubReqType as Srt
+import reactive.platform.fbs.FeedType as FbsFeedType
+import reactive.platform.fbs.SubReqType as FbsSrt
+import reactive.platform.fbs.Message as FbsMessage
 
-from typing import List, AnyStr, Callable
+from typing import AnyStr, Any, Callable, List
 
-from reactive.platform.fbs.feed.Body import Body
-from reactive.platform.fbs.feed.FeedRequestReject import FeedRequestReject
-from reactive.platform.fbs.feed.FeedRequestAck import FeedRequestAck
-from reactive.platform.fbs.feed.Message import Message
-
-from reactive.platform.feed.level2book import Level2Book
+from reactive.platform.feed.decode import parse_fbs
 from reactive.platform.feed.feedrequest import FeedRequest
 from reactive.platform.websocket.client import Client
-
-
-def md_null_handler(md: Level2Book = None):
-    pass
 
 
 class FeedClient(Client):
@@ -59,62 +50,42 @@ class FeedClient(Client):
         """
         addr = addr if addr is not None else self.ADDRESS
         super().__init__(key=key, addr=addr, close_timeout=close_timeout)
-        self.__subCache = dict()
         self.req_id = 0
 
     async def subscribe(self, markets: List[str],
-                        feed_type: int = FeedType.FeedType.Default,
+                        feed_type: int = FbsFeedType.FeedType.Default,
                         depth: int = 10,
                         grouping: int = 1,
                         frequency: int = 1):
         # FIXME: check if market is already subscribed and only subscribe new markets.
-        for market in markets:
-            self.__subCache[market] = True
         self.req_id += 1
         fr = FeedRequest(req_id=str(self.req_id), grouping=grouping, markets=markets,
-                         sub_req_type=Srt.SubReqType.Subscribe, feed_type=feed_type,
+                         sub_req_type=FbsSrt.SubReqType.Subscribe, feed_type=feed_type,
                          frequency=frequency, depth=depth)
         await self.send(fr.build_feed_request(self.builder))
 
     async def unsubscribe(self, markets: List[str],
-                          feed_type: int = FeedType.FeedType.Default,
+                          feed_type: int = FbsFeedType.FeedType.Default,
                           depth: int = 10, grouping: int = 1,
                           frequency: int = 1):
-        for market in markets:
-            if market in self.__subCache:
-                self.__subCache[market] = False
         self.req_id += 1
         fr = FeedRequest(req_id=str(self.req_id), grouping=grouping, markets=markets,
-                         sub_req_type=Srt.SubReqType.Unsubscribe, feed_type=feed_type,
+                         sub_req_type=FbsSrt.SubReqType.Unsubscribe, feed_type=feed_type,
                          frequency=frequency, depth=depth)
         await self.send(fr.build_feed_request(self.builder))
 
     async def _read(self, buf: AnyStr):
         """
-        _read overrides the Client _read method, and decoding buffer into fbs.Feed.MDSnapshotL2
-        and fbs.Feed.FeedRequestReject. If Message is fbs.Feed.MDSnapshotL2, convert into Level2Book
-        object, and call the callback handler, which accepts Level2Book object.
+        _read overrides the Client _read method, and decoding fbs.Message into the
+        corresponding object and call the callback handler.
         """
-        # TODO: change _read method to a decorator
-        msg = Message.GetRootAsMessage(buf, 0)
-        if msg.BodyType() == Body.MDSnapshotL2:
-            fbs_md = Ms.MDSnapshotL2()
-            fbs_md.Init(msg.Body().Bytes, msg.Body().Pos)
-            md = Level2Book.load_from_flat_buffer(fbs_md)
-            self.data_handler(md)
-        elif msg.BodyType() == Body.FeedRequestReject:
-            frr = FeedRequestReject()
-            frr.Init(msg.Body().Bytes, msg.Body().Pos)
-            print("market data request is rejected", frr.ErrorCode(), frr.ErrorMessage())
-        elif msg.BodyType() == Body.FeedRequestAck:
-            fra = FeedRequestAck()
-            fra.Init(msg.Body().Bytes, msg.Body().Pos)
-            print("feed ack, req_id: ", fra.ReqId(), " feed_id: ", fra.FeedId())
+        msg = FbsMessage.Message.GetRootAsMessage(buf, 0)
+        self.data_handler(parse_fbs(msg))
 
-    async def run(self, request_handler,
-                  data_handler: Callable[[Level2Book], None] = md_null_handler):
+    async def run(self, client_handler,
+                  data_handler: Callable[[Any], None] = None):
         """
         FeedClient expects handler callback method accept Level2Book object like
         handler(Level2Book), instead of handler(fbs.Message) in base Client.
         """
-        await super().run(request_handler=request_handler, data_handler=data_handler)
+        await super().run(client_handler=client_handler, data_handler=data_handler)

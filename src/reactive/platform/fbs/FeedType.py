@@ -4,4 +4,5 @@
 
 class FeedType(object):
     Default = 0
+    Trade = 1
 

@@ -82,7 +82,7 @@ df
 
 The websocket feed provides real-time level 2 market data snapshots and public trades via
 
-```angular2
+```
 wss://api.platform.reactivemarkets.com/feed
 ```
 
@@ -99,7 +99,7 @@ addr = "wss://api.platform.reactivemarkets.com/feed"
 feed_client = FeedClient(addr=addr, key=TOKEN)
 ```
 
-Use `feed_client` to subscribe market data, see a full example in
+Use `feed_client` to subscribe market data or trades for markets, see a full example in
 `example/marketdata.py`. The client can specify book view parameters in the request. Currently,
 the feed gateway supports, book depths (1, 5, 10, 20), tick grouping (1, 50) and frequency
 (100ms).
