@@ -17,27 +17,31 @@ a API token and URL. The token is issued from the trading platform UI under acco
     feed_client = FeedClient(addr=addr, key=TOKEN)
 
 
-Before starting subscriptions, creates a callback function to handle market data, and create an
-application coroutine to send market data subscription.
+Before start to subscribe data from feed server, two callback functions should be implemented:
+`data_handler` to process reading data from feed server, and `client_handler` function to control
+`FeedClient` (send request to platform) and execute user's codes.
 
 .. code:: python
 
-    from reactive.platform.feed.level2book import Level2Book
+    from reactive.platform.feed.mdsnapshotl2 import MDSnapshotL2
 
 
-    def md_print_handler(md: Level2Book):
+    def data_handler(data):
     """
-    implement a market data callback handler to print best bid and offer.
+    implement a data callback handler to print market data.
     """
+    if isinstance(obj, MDSnapshotL2):
+        md = obj
+        best_bid = md.bid_price[0] if md.bid_price.size > 0 else None
+        best_offer = md.offer_price[0] if md.offer_price.size > 0 else None
+        print(md.market, best_bid, best_offer)
+        print(md.depth)
+    else:
+        print(" not market data message")
 
-    best_bid = md.bid_side[0] if len(md.bid_side) > 0 else None
-    best_offer = md.offer_side[0] if len(md.offer_side) > 0 else None
-    print(md.market, best_bid.price, best_offer.price)
-
-    async def app_run(c: FeedClient):
+    async def client_handler(c: FeedClient):
     """
-    implement an application run coroutine to and subscribe or
-    unsubscribe markets.
+    implement client_handler
     """
 
     await c.subscribe(["BTCUSD-CNB"], depth=10, grouping=1)
@@ -48,12 +52,11 @@ view on the market data. Successful subscription will be notified via a feed ack
 including a feed_id which is an integer number to represents a book view (depth and grouping),
 and requested id corresponding to the client request. On the other hand, a feed reject message is
 received for a bad subscription. Currently only support depths: [1, 5, 10, 20] and grouping ticks
-with [1, 10, 50, 100]. (Not all the instruments are supported for different grouping yet. Use 1 as
-grouping value at this moment.)
+with [1, 10, 50, 100]. (Currently, only grouping value `1` for all the instruments are supported)
 
 Run the application as following:
 
 .. code:: python
 
-    run = asyncio.ensure_future(feed_client.run(app_run, md_print_handler))
+    run = asyncio.ensure_future(feed_client.run(client_handler, data_handler))
     asyncio.get_event_loop().run_until_complete(run)

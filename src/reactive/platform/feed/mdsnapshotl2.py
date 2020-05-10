@@ -23,10 +23,10 @@ import numpy as np
 import pandas as pd
 
 from math import isclose
-from reactive.platform.fbs.feed.MDSnapshotL2 import MDSnapshotL2
+import reactive.platform.fbs.MDSnapshotL2 as FbsMD
 
 
-class Level2Book:
+class MDSnapshotL2:
 
     def __init__(self, market: str,
                  bid_price: np.array,
@@ -112,30 +112,30 @@ class Level2Book:
         return False
 
     @classmethod
-    def load_from_flat_buffer(cls, md: MDSnapshotL2):
+    def load_from_fbs(cls, md: FbsMD.MDSnapshotL2):
         bid_length = md.BidSideLength()
         bid_price = np.zeros(bid_length, dtype=np.float64)
         bid_qty = np.zeros(bid_length, dtype=np.float64)
-        for i in range(0, md.BidSideLength()):
+        for i in range(0, bid_length):
             level = md.BidSide(i)
             bid_price[i] = level.Price()
             bid_qty[i] = level.Qty()
         offer_length = md.OfferSideLength()
         offer_price = np.zeros(offer_length, dtype=np.float64)
         offer_qty = np.zeros(offer_length, dtype=np.float64)
-        for i in range(0, md.OfferSideLength()):
+        for i in range(0, offer_length):
             level = md.OfferSide(i)
             offer_price[i] = level.Price()
             offer_qty[i] = level.Qty()
 
-        return Level2Book(market=md.Market(),
-                          bid_price=bid_price,
-                          bid_qty=bid_qty,
-                          offer_price=offer_price,
-                          offer_qty=offer_qty,
-                          feed_id=md.FeedId(),
-                          id=md.Id(),
-                          depth=md.Depth(),
-                          flag=md.Flags(),
-                          source_ts=md.SourceTs(),
-                          source=md.Source())
+        return cls(market=md.Market(),
+                   bid_price=bid_price,
+                   bid_qty=bid_qty,
+                   offer_price=offer_price,
+                   offer_qty=offer_qty,
+                   feed_id=md.FeedId(),
+                   id=md.Id(),
+                   depth=md.Depth(),
+                   flag=md.Flags(),
+                   source_ts=md.SourceTs(),
+                   source=md.Source())

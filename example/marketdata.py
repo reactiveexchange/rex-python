@@ -16,7 +16,7 @@ import asyncio
 import random
 
 from reactive.platform.feed.feedclient import FeedClient
-from reactive.platform.feed.level2book import Level2Book
+from reactive.platform.feed.handler import print_handler
 
 MARKET_LIST = ["EURUSD-REX", "EURGBP-REX", "EURCHF-REX", "EURRON-REX", "USDCAD-REX",
                "USDCHF-REX", "USDJPY-REX", "USDCHF-REX", "EURJPY-REX", "AUDUSD-REX",
@@ -32,16 +32,7 @@ def random_market():
     return MARKET_LIST[index]
 
 
-def md_print_handler(md: Level2Book):
-    """
-    implement a market data callback handler to print best bid and offer.
-    """
-    best_bid = md.bid_price[0] if md.bid_price.size > 0 else None
-    best_offer = md.offer_price[0] if md.offer_price.size > 0 else None
-    print(md.market, best_bid, best_offer)
-
-
-async def request_handler(c: FeedClient):
+async def client_handler(c: FeedClient):
     """
     implement an application request_handler coroutine to and subscribe or
     unsubscribe markets.
@@ -64,8 +55,8 @@ async def request_handler(c: FeedClient):
 
 def run():
     client = FeedClient(addr=ADDR, key=TOKEN, close_timeout=1.0)
-    run = asyncio.ensure_future(client.run(request_handler=request_handler,
-                                           data_handler=md_print_handler))
+    run = asyncio.ensure_future(client.run(client_handler=client_handler,
+                                           data_handler=print_handler))
     asyncio.get_event_loop().run_until_complete(run)
 
 

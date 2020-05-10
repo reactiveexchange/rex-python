@@ -19,25 +19,36 @@ import websockets
 from typing import Callable, AnyStr, Coroutine
 
 
-async def consume(ws: websockets.WebSocketClientProtocol, handler: Callable[[AnyStr], Coroutine]):
+async def read(ws: websockets.WebSocketClientProtocol, handler: Callable[[AnyStr], Coroutine]):
     """
-    Read data from web socket and handle the message via callback function handler.
-    Running consume in a task or future.
+    read reads data from web socket and handle the raw message via callback function handler.
+    Running read in a task or future.
     """
     async for message in ws:
         await handler(message)
 
 
-async def produce(ws: websockets.WebSocketClientProtocol, handler: Callable[[], Coroutine]):
+async def write(ws: websockets.WebSocketClientProtocol, writer: Callable[[], Coroutine]):
+    """
+    write sends a message, which reads from writer(), to client via websocket.
+    """
     while True:
-        message = await handler()
+        message = await writer()
         await ws.send(message)
 
 
-async def run_consume_produce(ws, consumer_handler, producer_handler,
-                              return_when=asyncio.ALL_COMPLETED):
-    consumer_task = asyncio.ensure_future(consume(ws, consumer_handler))
-    producer_task = asyncio.ensure_future(produce(ws, producer_handler))
+async def ws_conn_handler(ws: websockets.WebSocketClientProtocol,
+                          read_handler: Callable[[AnyStr], Coroutine],
+                          write_handler: Callable[[], Coroutine],
+                          return_when=asyncio.ALL_COMPLETED):
+    """
+    ws_conn_handler handls a websocket connection, read message from
+    websocket via read asyncoi.future with consumer_handler callback function, send
+    message via write asyncoi.future with producer_handler callback function.
+
+    """
+    consumer_task = asyncio.ensure_future(read(ws, read_handler))
+    producer_task = asyncio.ensure_future(write(ws, write_handler))
     done, pending = await asyncio.wait(
         [consumer_task, producer_task],
         return_when=return_when,
@@ -46,11 +57,11 @@ async def run_consume_produce(ws, consumer_handler, producer_handler,
         task.cancel()
 
 
-async def print_consumer_handler(msg):
+async def print_read_handler(msg):
     print(msg)
 
 
-async def null_producer_handler():
+async def null_writer_handler():
     return ""
 
 

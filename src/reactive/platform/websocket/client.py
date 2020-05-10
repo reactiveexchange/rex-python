@@ -17,12 +17,12 @@
 import asyncio
 import flatbuffers
 import websockets
+import reactive.platform.fbs.Message as FbsMessage
 
 from typing import AnyStr, Callable
 from websockets.http import Headers
 
-from reactive.platform.fbs.feed.Message import Message
-from reactive.platform.websocket.websocket import consume, produce
+from reactive.platform.websocket.websocket import read, write
 
 
 class Client:
@@ -42,16 +42,13 @@ class Client:
             key represents API key, which is used for verifying identity.
         """
         self.__addr = addr if addr is not None else self.ADDRESS
+        self.__key = key
         self.header = Headers(Authorization="Bearer " + key) if key is not None else None
         self.close_timeout = close_timeout
-        self.__conn = websockets.connect(self.__addr, extra_headers=self.header)
+
         self.__builder = flatbuffers.Builder(1400)
         self.__data_handler = None
         self.__queue = asyncio.Queue(10)
-
-    @property
-    def conn(self):
-        return self.__conn
 
     @property
     def builder(self):
@@ -61,12 +58,18 @@ class Client:
     def data_handler(self):
         return self.__data_handler
 
-    def register_data_handler(self, handler: Callable[[bytearray], None]):
-        self.__data_handler = handler
+    def register_data_handler(self, data_handler: Callable[[FbsMessage.Message], None]):
+        self.__data_handler = data_handler
 
-    async def send(self, request):
+    def get_conn(self):
         """
-        Sends a request message to server.
+        get_conn initialize a new connection, and return the connection.
+        """
+        return websockets.connect(self.__addr, extra_headers=self.header)
+
+    async def send(self, request: AnyStr):
+        """
+        Sends a request message.
 
         Parameters
         ----------
@@ -80,29 +83,29 @@ class Client:
         _read decode message into fbs.Message and call callback handler.
         """
         # TODO: change _read method to a decorator
-        msg = Message.GetRootAsMessage(buf, 0)
+        msg = FbsMessage.Message.GetRootAsMessage(buf, 0)
         self.__data_handler(msg)
 
     async def _write(self):
         return await self.__queue.get()
 
-    async def run(self, request_handler, data_handler: Callable[[Message], None] = None):
+    async def run(self, client_handler, data_handler: Callable[[FbsMessage.Message], None] = None):
         """
-        run coroutine will trigger three asyncio futures running on event loop. The Consumer_task
-        is reading data from web socket and trigger the user defined callback handler, the second
-        producer_task is reading from internal request queue and send requests to server, and the
-        last task is the request_handler which is user implemented coroutine has a contact:
+        run runs a coroutine to trigger three asyncio futures running on event loop. The
+        consumer_task is reading data from web socket and trigger the user defined callback handler,
+        the second producer_task is reading from internal request queue and send requests to server,
+        and the last task is the client_handler which is user implemented coroutine has a contact:
         `func(Client)`.
 
         Parameters
         ----------
-        request_handler : callable[[Client], None]
-            request_handler is a user defined coroutine, which will be wrapped into a future,
-            and running with consume / produce futures together in the event_loop.
-            In the request_handler, user can send request messages via `send` method, or execute
-            any expressions.
+        client_handler : callable[[Client], None]
+            client_handler is a user defined coroutine, which will be wrapped into a future,
+            and running with read / write futures together in the event_loop.
+            In the client_handler, user can use Client object to send request messages via
+            `send` method, or execute any codes with the Client object.
 
-        data_handler: callable[[Any], None]
+        data_handler: callable[[Message], None]
             callback handler handles message read from web sockets.
 
         """
@@ -111,10 +114,12 @@ class Client:
         if self.__data_handler is None:
             raise RuntimeError("no call back data handler for the client")
         try:
-            ws = await asyncio.wait_for(self.__conn, timeout=self.close_timeout)
-            consumer_task = asyncio.ensure_future(consume(ws, self._read))
-            producer_task = asyncio.ensure_future(produce(ws, self._write))
-            asyncio.ensure_future(request_handler(self))
+            conn = self.get_conn()
+            # do not use `with conn as ws:` this is because cannot set close_timeout.
+            ws = await asyncio.wait_for(conn, timeout=self.close_timeout)
+            consumer_task = asyncio.ensure_future(read(ws, self._read))
+            producer_task = asyncio.ensure_future(write(ws, self._write))
+            asyncio.ensure_future(client_handler(self))
             done, pending = await asyncio.wait(
                 [consumer_task, producer_task],
                 return_when=asyncio.FIRST_COMPLETED,
@@ -124,4 +129,4 @@ class Client:
         except Exception:
             raise
         else:
-            self.__conn.ws_client.close()
+            conn.ws_client.close()

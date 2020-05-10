@@ -17,10 +17,10 @@ import numpy as np
 
 import unittest
 
-from reactive.platform.feed.level2book import Level2Book
+from reactive.platform.feed.mdsnapshotl2 import MDSnapshotL2
 
 
-class Level2BookTestCase(unittest.TestCase):
+class MDSnapshotL2TestCase(unittest.TestCase):
 
     def test_depth(self):
         bid_price = np.array([1.0, 0.9])
@@ -28,12 +28,12 @@ class Level2BookTestCase(unittest.TestCase):
         offer_price = np.array([1.1, 1.2, 1.3])
         offer_qty = np.array([10.0, 9.0, 8.0])
 
-        book = Level2Book(market="EURUSD-REX", bid_price=bid_price, bid_qty=bid_qty,
-                          offer_price=offer_price, offer_qty=offer_qty)
+        book = MDSnapshotL2(market="EURUSD-REX", bid_price=bid_price, bid_qty=bid_qty,
+                            offer_price=offer_price, offer_qty=offer_qty)
         self.assertEqual(2, book.bid_depth())
         self.assertEqual(3, book.offer_depth())
         self.assertFalse(book.is_empty())
 
-        book = Level2Book(market="EURUSD-REX", bid_price=np.zeros(1), bid_qty=np.zeros(1),
-                          offer_price=np.zeros(1), offer_qty=np.zeros(1))
+        book = MDSnapshotL2(market="EURUSD-REX", bid_price=np.zeros(1), bid_qty=np.zeros(1),
+                            offer_price=np.zeros(1), offer_qty=np.zeros(1))
         self.assertTrue(book.is_empty())

@@ -15,11 +15,11 @@
 
 import flatbuffers
 
-import reactive.platform.fbs.feed.Body as Body
-import reactive.platform.fbs.feed.FeedType as FeedType
-import reactive.platform.fbs.feed.FeedRequest as Fr
-import reactive.platform.fbs.feed.Message as Message
-import reactive.platform.fbs.feed.SubReqType as Srt
+import reactive.platform.fbs.Body as FbsBody
+import reactive.platform.fbs.FeedType as FbsFeedType
+import reactive.platform.fbs.FeedRequest as FbsFr
+import reactive.platform.fbs.Message as FbsMessage
+import reactive.platform.fbs.SubReqType as FbsSrt
 
 from time import time_ns
 from typing import List
@@ -30,10 +30,10 @@ class FeedRequest:
     FeedRequest class is responsible for creating a feed.FeedRequest flatbuffer message.
     """
     def __init__(self, req_id: str, markets: List[str],
-                 feed_type: int = FeedType.FeedType.Default,
+                 feed_type: int = FbsFeedType.FeedType.Default,
                  depth: int = 10,
                  grouping: int = 1,
-                 sub_req_type: int = Srt.SubReqType.Subscribe,
+                 sub_req_type: int = FbsSrt.SubReqType.Subscribe,
                  frequency: int = 1):
         self.req_id = req_id
         self.markets = markets
@@ -51,25 +51,25 @@ class FeedRequest:
             build_market.append(builder.CreateString(market))
         req_id_string = builder.CreateString(self.req_id)
 
-        Fr.FeedRequestStartMarketsVector(builder, size)
+        FbsFr.FeedRequestStartMarketsVector(builder, size)
         for b in reversed(build_market):
             builder.PrependUOffsetTRelative(b)
         markets = builder.EndVector(size)
 
-        Fr.FeedRequestStart(builder)
-        Fr.FeedRequestAddReqId(builder, req_id_string)
-        Fr.FeedRequestAddSubReqType(builder, self.sub_req_type)
-        Fr.FeedRequestAddFeedType(builder, self.feed_type)
-        Fr.FeedRequestAddGrouping(builder, self.grouping)
-        Fr.FeedRequestAddDepth(builder, self.depth)
-        Fr.FeedRequestAddFrequency(builder, self.frequency)
-        Fr.FeedRequestAddMarkets(builder, markets)
-        feed_req = Fr.FeedRequestEnd(builder)
+        FbsFr.FeedRequestStart(builder)
+        FbsFr.FeedRequestAddReqId(builder, req_id_string)
+        FbsFr.FeedRequestAddSubReqType(builder, self.sub_req_type)
+        FbsFr.FeedRequestAddFeedType(builder, self.feed_type)
+        FbsFr.FeedRequestAddGrouping(builder, self.grouping)
+        FbsFr.FeedRequestAddDepth(builder, self.depth)
+        FbsFr.FeedRequestAddFrequency(builder, self.frequency)
+        FbsFr.FeedRequestAddMarkets(builder, markets)
+        feed_req = FbsFr.FeedRequestEnd(builder)
 
-        Message.MessageStart(builder)
-        Message.MessageAddTts(builder, time_ns())
-        Message.MessageAddBodyType(builder, Body.Body.FeedRequest)
-        Message.MessageAddBody(builder, feed_req)
-        msg = Message.MessageEnd(builder)
+        FbsMessage.MessageStart(builder)
+        FbsMessage.MessageAddTts(builder, time_ns())
+        FbsMessage.MessageAddBodyType(builder, FbsBody.Body.FeedRequest)
+        FbsMessage.MessageAddBody(builder, feed_req)
+        msg = FbsMessage.MessageEnd(builder)
         builder.Finish(msg)
         return builder.Output()
