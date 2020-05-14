@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import reactive.platform.fbs.FeedType as FbsFeedType
-import reactive.platform.fbs.SubReqType as FbsSrt
-import reactive.platform.fbs.Message as FbsMessage
+import reactivemarkets.papi.FeedType as FbsFeedType
+import reactivemarkets.papi.SubReqType as FbsSrt
+import reactivemarkets.papi.Message as FbsMessage
 
 from typing import AnyStr, Any, Callable, List
 

@@ -13,16 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import reactive.platform.fbs.MDSnapshotL2 as Mds
-import reactive.platform.fbs.PublicTrade as Pt
-import reactive.platform.fbs.FeedRequestAck as Fra
-import reactive.platform.fbs.FeedRequestReject as Frr
+import reactivemarkets.papi.MDSnapshotL2 as Mds
+import reactivemarkets.papi.PublicTrade as Pt
+import reactivemarkets.papi.FeedRequestAccept as Fra
+import reactivemarkets.papi.FeedRequestReject as Frr
 
-from reactive.platform.fbs.Body import Body
-from reactive.platform.fbs.Message import Message
+from reactivemarkets.papi.Body import Body
+from reactivemarkets.papi.Message import Message
 
 
-from reactive.platform.feed.feedack import FeedRequestAck
+from reactive.platform.feed.feedack import FeedRequestAccept
 from reactive.platform.feed.feedrequestreject import FeedRequestReject
 from reactive.platform.feed.mdsnapshotl2 import MDSnapshotL2
 from reactive.platform.feed.publictrade import PublicTrade
@@ -30,7 +30,7 @@ from reactive.platform.feed.publictrade import PublicTrade
 
 def parse_fbs(msg: Message):
     """
-    Decode a reactive.platform.fbs.Message.
+    Decode a reactivemarkets.papi.Message.
     """
     if msg.BodyType() == Body.MDSnapshotL2:
         fbs_md = Mds.MDSnapshotL2()
@@ -44,7 +44,7 @@ def parse_fbs(msg: Message):
         frr = Frr.FeedRequestReject()
         frr.Init(msg.Body().Bytes, msg.Body().Pos)
         return FeedRequestReject.load_from_fbs(frr)
-    elif msg.BodyType() == Body.FeedRequestAck:
-        fra = Fra.FeedRequestAck()
+    elif msg.BodyType() == Body.FeedRequestAccept:
+        fra = Fra.FeedRequestAccept()
         fra.Init(msg.Body().Bytes, msg.Body().Pos)
-        return FeedRequestAck.load_from_fbs(fra)
+        return FeedRequestAccept.load_from_fbs(fra)

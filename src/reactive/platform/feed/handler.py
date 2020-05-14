@@ -15,20 +15,20 @@
 
 from typing import Union
 
-from reactive.platform.feed.feedack import FeedRequestAck
+from reactive.platform.feed.feedack import FeedRequestAccept
 from reactive.platform.feed.feedrequestreject import FeedRequestReject
 from reactive.platform.feed.mdsnapshotl2 import MDSnapshotL2
 from reactive.platform.feed.publictrade import PublicTrade
 
 
-def print_handler(obj: Union[FeedRequestAck, FeedRequestReject, MDSnapshotL2, PublicTrade]):
+def print_handler(obj: Union[FeedRequestAccept, FeedRequestReject, MDSnapshotL2, PublicTrade]):
     """
     implement a print callback handler for FeedClient.
 
     Parameters
     ----------
     obj: object
-        a object of FeedRequestAck, FeedRequestReject, MDSnapshotL2 or PublicTrade class.
+        a object of FeedRequestAccept, FeedRequestReject, MDSnapshotL2 or PublicTrade class.
     """
     if isinstance(obj, MDSnapshotL2):
         md = obj
@@ -43,7 +43,7 @@ def print_handler(obj: Union[FeedRequestAck, FeedRequestReject, MDSnapshotL2, Pu
         reject = obj
         print(f"feed request {reject.req_id} is rejected: {reject.error_code},"
               f"{reject.error_message}")
-    elif isinstance(obj, FeedRequestAck):
+    elif isinstance(obj, FeedRequestAccept):
         ack = obj
         print(f"feed ack, req_id: {ack.req_id} feed_id: {ack.feed_id}")
     else:

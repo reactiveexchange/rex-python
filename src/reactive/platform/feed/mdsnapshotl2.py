@@ -23,7 +23,7 @@ import numpy as np
 import pandas as pd
 
 from math import isclose
-import reactive.platform.fbs.MDSnapshotL2 as FbsMD
+import reactivemarkets.papi.MDSnapshotL2 as FbsMD
 
 
 class MDSnapshotL2:

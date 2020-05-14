@@ -18,15 +18,15 @@ Summary
 feed ack data structures.
 """
 
-import reactive.platform.fbs.FeedRequestAck as FbsFra
+import reactivemarkets.papi.FeedRequestAccept as FbsFra
 
 
-class FeedRequestAck:
+class FeedRequestAccept:
 
     def __init__(self, feed_id: int, req_id: str = ""):
         self.feed_id = feed_id
         self.req_id = req_id
 
     @classmethod
-    def load_from_fbs(cls, ack: FbsFra.FeedRequestAck):
+    def load_from_fbs(cls, ack: FbsFra.FeedRequestAccept):
         return cls(feed_id=ack.FeedId(), req_id=ack.ReqId())

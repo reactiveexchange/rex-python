@@ -15,11 +15,11 @@
 
 import flatbuffers
 
-import reactive.platform.fbs.Body as FbsBody
-import reactive.platform.fbs.FeedType as FbsFeedType
-import reactive.platform.fbs.FeedRequest as FbsFr
-import reactive.platform.fbs.Message as FbsMessage
-import reactive.platform.fbs.SubReqType as FbsSrt
+import reactivemarkets.papi.Body as FbsBody
+import reactivemarkets.papi.FeedType as FbsFeedType
+import reactivemarkets.papi.FeedRequest as FbsFr
+import reactivemarkets.papi.Message as FbsMessage
+import reactivemarkets.papi.SubReqType as FbsSrt
 
 from time import time_ns
 from typing import List
