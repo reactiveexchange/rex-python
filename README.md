@@ -107,4 +107,4 @@ the feed gateway supports, book depths (1, 5, 10, 20), tick grouping (1, 50) and
 The message protocol via feed gateway is Flatbuffers, which provides an efficient
 serialization/deserializaton mechanism in terms of both processing and space requirements.
 The reactive-platform generated python classes Flatbuffer schema are located under
-`reactive.platform.fbs`.
+`reactivemarkets.papi`.
