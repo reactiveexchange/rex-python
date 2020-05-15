@@ -1,6 +1,6 @@
-# Reactive-Platform Python
+# Reactive Markets Platform SDK Python
 
-The Reactive Platform API for Python.
+The Reactive Platform SDK for Python.
 
 ## Getting Started
 
@@ -36,7 +36,6 @@ from reactive.platform.rest.client import Client
 key = 'xxx'
 url = "https://api.platform.reactivemarkets.com"
 rc = Client(url=url, key=key)
-
 ```
 
 ### Reference Data
@@ -66,7 +65,6 @@ print("venue reference:\n", venues)
 market_ref = rc.fetch_market_ref()
 markets = market_ref.to_json()
 print("market reference:\n", venues)
-
 ```
 
 If client uses pandas, the reference data can be viewed in a Dataframe table in jupyter-notebook:
@@ -78,7 +76,7 @@ df = pd.read_json(market_ref.to_json())
 df
 ```
 
-## Feed Gateway WekSocket API
+## Feed Gateway WebSocket API
 
 The websocket feed provides real-time level 2 market data snapshots and public trades via
 
@@ -86,9 +84,9 @@ The websocket feed provides real-time level 2 market data snapshots and public t
 wss://api.platform.reactivemarkets.com/feed
 ```
 
-### Create an FeedClient
+### Create a FeedClient
 
-To access feed gateway via web socket, create an FeedClient which manages the web socket connection
+To access the feed gateway via web socket, create an FeedClient which manages the web socket connection
 and provides methods to access the gateway.
 
 ```python
