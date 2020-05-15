@@ -10,13 +10,13 @@ The Reactive Platform API for python.
 Rest API Client
 ----------------
 
-A API token for a client must be generated first from the trading platform under account settings.
+A API token for a client must be granted from the platform under account settings.
 
 Create a Rest API `Client` with the token and platform address.
 
 .. code:: python
 
-    from reactive.platform.client import Client
+    from reactive.platform.rest.client import Client
     key = 'xxx'
     url = "https://api.platform.reactivemarkets.com"
     rc = Client(url=url, key=key)
@@ -27,7 +27,7 @@ Use methods of `rc` client to access data.
 Reference Data
 ---------------
 
-Reference data includes asset, instrument, venue and markets.
+Reference data includes asset, instrument, venue and markets on Reactive Platform.
 
 .. code:: python
 

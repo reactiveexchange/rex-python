@@ -1,4 +1,4 @@
-.. _marketdata:
+.. _platform websocket:
 
 ==========
 MarketData
@@ -10,7 +10,7 @@ a API token and URL. The token is issued from the trading platform UI under acco
 
 .. code:: python
 
-    from reactive.platform.feed.feedclient import FeedClient
+    from reactive.platform.feed.client import FeedClient
 
     TOKEN = 'xxx'
     addr = "wss://api.platform.reactivemarkets.com/feed"
@@ -60,3 +60,22 @@ Run the application as following:
 
     run = asyncio.ensure_future(feed_client.run(client_handler, data_handler))
     asyncio.get_event_loop().run_until_complete(run)
+
+
+===========
+PublicTrade
+===========
+
+Public trade channel publishes real-time trade message from platform, clients must set
+`FeedType` to `FeedTypeTrade` in the requests.
+
+
+.. code:: python
+
+    async def client_handler(c: FeedClient):
+    """
+    implement client_handler
+    """
+
+    await c.subscribe(["BTCUSD-CNB"], feed_type=FeedType.Trade)
+

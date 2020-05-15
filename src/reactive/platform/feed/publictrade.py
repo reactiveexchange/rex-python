@@ -19,7 +19,7 @@ Public trade data structures.
 
 """
 
-import reactivemarkets.papi.PublicTrade as FbsPt
+import reactive.papi.PublicTrade as FbsPt
 
 
 class PublicTrade:

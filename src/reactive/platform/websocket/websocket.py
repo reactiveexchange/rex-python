@@ -21,8 +21,8 @@ from typing import Callable, AnyStr, Coroutine
 
 async def read(ws: websockets.WebSocketClientProtocol, handler: Callable[[AnyStr], Coroutine]):
     """
-    read reads data from web socket and handle the raw message via callback function handler.
-    Running read in a task or future.
+    read read data from websocket and handle the raw message via callback handler.
+    Running read as a task or future.
     """
     async for message in ws:
         await handler(message)
@@ -30,7 +30,9 @@ async def read(ws: websockets.WebSocketClientProtocol, handler: Callable[[AnyStr
 
 async def write(ws: websockets.WebSocketClientProtocol, writer: Callable[[], Coroutine]):
     """
-    write sends a message, which reads from writer(), to client via websocket.
+    write gets a message from writer handler, and send the message via websocket.
+
+    sends a message to the other side, which reads from writer(), via websocket.
     """
     while True:
         message = await writer()
@@ -42,8 +44,8 @@ async def ws_conn_handler(ws: websockets.WebSocketClientProtocol,
                           write_handler: Callable[[], Coroutine],
                           return_when=asyncio.ALL_COMPLETED):
     """
-    ws_conn_handler handls a websocket connection, read message from
-    websocket via read asyncoi.future with consumer_handler callback function, send
+    ws_conn_handler handles a websocket connection, reads data from
+    websocket via read asyncoi.future with consumer_handler callback function, sends
     message via write asyncoi.future with producer_handler callback function.
 
     """
@@ -55,14 +57,6 @@ async def ws_conn_handler(ws: websockets.WebSocketClientProtocol,
     )
     for task in pending:
         task.cancel()
-
-
-async def print_read_handler(msg):
-    print(msg)
-
-
-async def null_writer_handler():
-    return ""
 
 
 def ws_address(host: str, port: int, path: str) -> str:
