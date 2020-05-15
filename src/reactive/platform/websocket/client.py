@@ -17,7 +17,7 @@
 import asyncio
 import flatbuffers
 import websockets
-import reactivemarkets.papi.Message as FbsMessage
+import reactive.papi.Message as FbsMessage
 
 from typing import AnyStr, Callable
 from websockets.http import Headers

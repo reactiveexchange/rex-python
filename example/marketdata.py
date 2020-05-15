@@ -15,7 +15,7 @@
 import asyncio
 import random
 
-from reactive.platform.feed.feedclient import FeedClient
+from reactive.platform.feed.client import FeedClient
 from reactive.platform.feed.handler import print_handler
 
 MARKET_LIST = ["EURUSD-REX", "EURGBP-REX", "EURCHF-REX", "EURRON-REX", "USDCAD-REX",
@@ -34,8 +34,8 @@ def random_market():
 
 async def client_handler(c: FeedClient):
     """
-    implement an application request_handler coroutine to and subscribe or
-    unsubscribe markets.
+    implement an application client_handler coroutine to and subscribe or
+    unsubscribe marketdata.
     """
 
     # unknown markets, expect an reject message

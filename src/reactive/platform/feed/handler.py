@@ -15,7 +15,7 @@
 
 from typing import Union
 
-from reactive.platform.feed.feedack import FeedRequestAccept
+from reactive.platform.feed.feedaccept import FeedRequestAccept
 from reactive.platform.feed.feedrequestreject import FeedRequestReject
 from reactive.platform.feed.mdsnapshotl2 import MDSnapshotL2
 from reactive.platform.feed.publictrade import PublicTrade

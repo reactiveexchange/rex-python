@@ -12,7 +12,7 @@ Start by creating a virtual environment and installing required packages:
     $ source venv/bin/activate
     $ pip install -r requirements.txt
 
-Enable development mode when developing new modules:
+Enable development mode when developing new python subpackage or module:
 
 .. code:: bash
 

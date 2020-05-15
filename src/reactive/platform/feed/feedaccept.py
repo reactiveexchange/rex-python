@@ -12,16 +12,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-""""
-Setup file.
+"""
+Summary
+-------
+feed ack data structures.
 """
 
-from setuptools import setup, find_namespace_packages
+import reactive.papi.FeedRequestAccept as FbsFra
 
-setup(
-    use_scm_version=True,
-    setup_requires=['setuptools_scm'],
-    packages=find_namespace_packages(where="src"),
-    namespace_packages=['reactive'],
-)
+
+class FeedRequestAccept:
+
+    def __init__(self, feed_id: int, req_id: str = ""):
+        self.feed_id = feed_id
+        self.req_id = req_id
+
+    @classmethod
+    def load_from_fbs(cls, ack: FbsFra.FeedRequestAccept):
+        return cls(feed_id=ack.FeedId(), req_id=ack.ReqId())

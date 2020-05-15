@@ -1,4 +1,5 @@
-flatbuffers
+flatbuffers>=1.12
+reactive-papi==0.7.0
 pytz==2020.1
 requests==2.23.0
 urllib3>=1.25.2,<1.26

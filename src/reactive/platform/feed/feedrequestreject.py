@@ -18,7 +18,7 @@ Summary
 feed ack data structures.
 """
 
-import reactivemarkets.papi.FeedRequestReject as FbsFrr
+import reactive.papi.FeedRequestReject as FbsFrr
 
 
 class FeedRequestReject:

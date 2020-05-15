@@ -13,16 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import reactivemarkets.papi.MDSnapshotL2 as Mds
-import reactivemarkets.papi.PublicTrade as Pt
-import reactivemarkets.papi.FeedRequestAccept as Fra
-import reactivemarkets.papi.FeedRequestReject as Frr
+import reactive.papi.MDSnapshotL2 as Mds
+import reactive.papi.PublicTrade as Pt
+import reactive.papi.FeedRequestAccept as Fra
+import reactive.papi.FeedRequestReject as Frr
 
-from reactivemarkets.papi.Body import Body
-from reactivemarkets.papi.Message import Message
+from reactive.papi.Body import Body
+from reactive.papi.Message import Message
 
-
-from reactive.platform.feed.feedack import FeedRequestAccept
+from reactive.platform.feed.feedaccept import FeedRequestAccept
 from reactive.platform.feed.feedrequestreject import FeedRequestReject
 from reactive.platform.feed.mdsnapshotl2 import MDSnapshotL2
 from reactive.platform.feed.publictrade import PublicTrade
@@ -30,7 +29,7 @@ from reactive.platform.feed.publictrade import PublicTrade
 
 def parse_fbs(msg: Message):
     """
-    Decode a reactivemarkets.papi.Message.
+    Decode a reactive.papi.Message.
     """
     if msg.BodyType() == Body.MDSnapshotL2:
         fbs_md = Mds.MDSnapshotL2()

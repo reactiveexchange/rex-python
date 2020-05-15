@@ -12,21 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Summary
--------
-feed ack data structures.
-"""
-
-import reactivemarkets.papi.FeedRequestAccept as FbsFra
 
 
-class FeedRequestAccept:
+async def print_read_handler(msg):
+    print(msg)
 
-    def __init__(self, feed_id: int, req_id: str = ""):
-        self.feed_id = feed_id
-        self.req_id = req_id
 
-    @classmethod
-    def load_from_fbs(cls, ack: FbsFra.FeedRequestAccept):
-        return cls(feed_id=ack.FeedId(), req_id=ack.ReqId())
+async def null_writer_handler():
+    return ""

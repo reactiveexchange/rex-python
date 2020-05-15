@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import reactivemarkets.papi.FeedType as FbsFeedType
-import reactivemarkets.papi.SubReqType as FbsSrt
-import reactivemarkets.papi.Message as FbsMessage
+import reactive.papi.FeedType as FbsFeedType
+import reactive.papi.SubReqType as FbsSrt
+import reactive.papi.Message as FbsMessage
 
 from typing import AnyStr, Any, Callable, List
 
@@ -56,7 +56,28 @@ class FeedClient(Client):
                         feed_type: int = FbsFeedType.FeedType.Default,
                         depth: int = 10,
                         grouping: int = 1,
-                        frequency: int = 1):
+                        frequency: int = 100):
+        """
+        subscribe sends a subscription FeedRequest to reactive platform, the default request is
+        marketdata request.
+
+        Parameters
+        ----------
+        markets : List[str]
+          subscribe market lists.
+        feed_type: FeedType, default: FbsFeedType.FeedType.Default
+          default type is for subscribing marketdata channel, FeedTypeTrade is for
+           subscribing public trade channel.
+        depth : int, default 10
+          subscribe marketdata l2 orderbook depths, if feed_type is Default, otherwise the field is
+          ignored.
+        grouping: int, default 1
+          subscribe marketdata l2 orderbook grouping ticks per level, if feed_type is Default,
+          otherwise the field is ignored.
+        frequency: int, default 100
+          required marketdata update frequency by millisecond, if feed_type is Default,
+          otherwise the field is ignored.
+        """
         # FIXME: check if market is already subscribed and only subscribe new markets.
         self.req_id += 1
         fr = FeedRequest(req_id=str(self.req_id), grouping=grouping, markets=markets,
@@ -68,6 +89,10 @@ class FeedClient(Client):
                           feed_type: int = FbsFeedType.FeedType.Default,
                           depth: int = 10, grouping: int = 1,
                           frequency: int = 1):
+        """
+        unsubscribe sends a unsubscription FeedRequest to reactive platform, the default request is
+        marketdata request.
+        """
         self.req_id += 1
         fr = FeedRequest(req_id=str(self.req_id), grouping=grouping, markets=markets,
                          sub_req_type=FbsSrt.SubReqType.Unsubscribe, feed_type=feed_type,
