@@ -26,6 +26,11 @@ from reactive.platform.websocket.websocket import read, write
 
 
 class Client:
+    """
+    Client handles websocket connection with reactive platform. The data_handler must accept
+    an reactive.papi.Message.Message type, which is from reactive platform Flatbuffers
+    definition.
+    """
 
     ADDRESS = "wss://api.platform.reactivemarkets.com/stream"
     IO_TIMEOUT = 2.0

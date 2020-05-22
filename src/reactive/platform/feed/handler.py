@@ -21,7 +21,8 @@ from reactive.platform.feed.mdsnapshotl2 import MDSnapshotL2
 from reactive.platform.feed.publictrade import PublicTrade
 
 
-def print_handler(obj: Union[FeedRequestAccept, FeedRequestReject, MDSnapshotL2, PublicTrade]):
+def print_data_handler(obj: Union[FeedRequestAccept, FeedRequestReject,
+                                  MDSnapshotL2, PublicTrade]):
     """
     implement a print callback handler for FeedClient.
 
@@ -35,7 +36,7 @@ def print_handler(obj: Union[FeedRequestAccept, FeedRequestReject, MDSnapshotL2,
         best_bid = md.bid_price[0] if md.bid_price.size > 0 else None
         best_offer = md.offer_price[0] if md.offer_price.size > 0 else None
         print(md.market, best_bid, best_offer)
-        print(md.depth)
+        print("market depth: ", md.depth)
     elif isinstance(obj, PublicTrade):
         trade = obj
         print(trade.market, trade.exec_venue, trade.price, trade.qty, trade.side)

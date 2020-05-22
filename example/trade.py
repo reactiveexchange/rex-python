@@ -14,38 +14,22 @@
 # limitations under the License.
 
 import asyncio
-import random
 
 from reactive.platform.feed.client import FeedClient
 from reactive.platform.feed.handler import print_data_handler
+from reactive.papi.FeedType import FeedType
 
-MARKET_LIST = ["BTCUSD-BFN", "ETHUSD-BFN", "LTCUSD-BFN", "XRPUSD-BFN",
-               "BCHUSDT-BIN", "BTCUSDT-BIN", "ETHUSDT-BIN", "LTCUSDT-BIN", "XRPUSDT-BIN",
-               "BCHUSD-CNB", "BTCUSD-CNB", "ETHUSD-CNB", "LTCUSD-CNB", "XRPUSD-CNB"]
 TOKEN = ""
 ADDR = "wss://api.platform.reactivemarkets.com/feed"
 
 
-def random_market():
-    index = random.randint(0, len(MARKET_LIST) - 1)
-    return MARKET_LIST[index]
-
-
 async def feed_client_handler(c: FeedClient):
     """
-    implement an application client_handler coroutine to and subscribe or
-    unsubscribe random marketdata.
+    implement a feed_client_handler coroutine to send a FeedRequest to subscribe BTCUSD-BFN and
+    BTCUSD-CNB trades
     """
-    while True:
-        market = random_market()
-        print("sub", market)
-        await c.subscribe([market], depth=0, grouping=0)
-        await c.subscribe([market], depth=5)
-        await asyncio.sleep(3)
-        print("unsub", market)
-        await c.unsubscribe([market], depth=0, grouping=0)
-        await c.unsubscribe([market], depth=5)
-        await asyncio.sleep(1)
+
+    await c.subscribe(["BTCUSD-BFN", "BTCUSD-CNB"], feed_type=FeedType.Trade)
 
 
 def run():

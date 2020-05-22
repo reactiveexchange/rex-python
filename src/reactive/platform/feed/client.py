@@ -19,7 +19,7 @@ import reactive.papi.Message as FbsMessage
 
 from typing import AnyStr, Any, Callable, List
 
-from reactive.platform.feed.decode import parse_fbs
+from reactive.platform.feed.decode import load_from_fbs
 from reactive.platform.feed.feedrequest import FeedRequest
 from reactive.platform.websocket.client import Client
 
@@ -105,7 +105,7 @@ class FeedClient(Client):
         corresponding object and call the callback handler.
         """
         msg = FbsMessage.Message.GetRootAsMessage(buf, 0)
-        self.data_handler(parse_fbs(msg))
+        self.data_handler(load_from_fbs(msg))
 
     async def run(self, client_handler,
                   data_handler: Callable[[Any], None] = None):
