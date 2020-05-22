@@ -22,3 +22,7 @@ __author__ = ['fzhao']
 
 class TokenNotFound(Exception):
     pass
+
+
+class MessageTypeNotFound(Exception):
+    pass

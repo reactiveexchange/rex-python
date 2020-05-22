@@ -13,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from reactive.papi.Message import Message
+from reactive.papi.Body import Body
+from reactive.platform.websocket.decode import decode_fbs
+
 
 async def print_read_handler(msg):
     print(msg)
@@ -20,3 +24,26 @@ async def print_read_handler(msg):
 
 async def null_writer_handler():
     return ""
+
+
+def print_data_handler(msg: Message):
+    """
+    implement a print callback handler for Client.
+    """
+    body_type, body = decode_fbs(msg)
+    if body_type == Body.MDSnapshotL2:
+        market = body.Market()
+        bid_length = body.BidSideLength()
+        best_bid = None if bid_length == 0 else body.BidSide(0).Price()
+        offer_length = body.OfferSideLength()
+        best_offer = None if offer_length == 0 else body.OfferSide(0).Price()
+        print(market, best_bid, best_offer)
+    elif body_type == Body.PublicTrade:
+        print(body.Market(), body.ExecVenue(), body.Price(), body.Qty(), body.Side())
+    elif body_type == Body.FeedRequestReject:
+        print(f"feed request {body.ReqId()} is rejected: {body.ErrorCode()},"
+              f"{body.ErrorMessage()}")
+    elif body_type == Body.FeedRequestAccept:
+        print(f"feed ack, req_id: {body.ReqId()} feed_id: {body.FeedId()}")
+    else:
+        print("unknown object")

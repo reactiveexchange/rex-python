@@ -84,25 +84,33 @@ The websocket feed provides real-time level 2 market data snapshots and public t
 wss://api.platform.reactivemarkets.com/feed
 ```
 
+## WebSocket Client
+
+To access the feed gateway via web socket, create a Client which manages the web socket connection
+and provides methods to access the gateway. See the example in `example/wsclient.py`.
+
+The message protocol via feed gateway is Flatbuffers, which provides an efficient
+serialization/deserializaton mechanism in terms of both processing and space requirements.
+The reactive-platform generated python classes Flatbuffer schema are located under the dependency
+`reactive.papi`.
+
+Client object decodes into `reactive.papi.Message.Message` and allow user to use customised
+`data_handler` call back to handle the flatbuffer message.
+
 ### Create a FeedClient
 
-To access the feed gateway via web socket, create an FeedClient which manages the web socket connection
-and provides methods to access the gateway.
+The platform-py also provides another option, `FeedClient`. 
 
 ```python
-from reactive.platform.feed.feedclient import FeedClient
+from reactive.platform.feed.client import FeedClient
 
 TOKEN = 'xxx'
 addr = "wss://api.platform.reactivemarkets.com/feed"
 feed_client = FeedClient(addr=addr, key=TOKEN)
 ```
 
-Use `feed_client` to subscribe market data or trades for markets, see a full example in
-`example/marketdata.py`. The client can specify book view parameters in the request. Currently,
-the feed gateway supports, book depths (1, 5, 10, 20), tick grouping (1, 50) and frequency
-(100ms).
-
-The message protocol via feed gateway is Flatbuffers, which provides an efficient
-serialization/deserializaton mechanism in terms of both processing and space requirements.
-The reactive-platform generated python classes Flatbuffer schema are located under
-`reactivemarkets.papi`.
+FeedClient provides methods `subscribe` and `unsubscribe` to control sending request to platform,
+and implement python classes for corresponding flatbuffer data types in `reactive.papi`.
+see a full example in `example/marketdata.py` or `example/trade`. The client can specify book view
+parameters in the request. Currently, the feed gateway supports, book depths (1, 5, 10, 20) and
+tick grouping (1, 50).

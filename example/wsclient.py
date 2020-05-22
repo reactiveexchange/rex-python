@@ -15,13 +15,19 @@
 
 import asyncio
 import random
+import flatbuffers
 
-from reactive.platform.feed.client import FeedClient
-from reactive.platform.feed.handler import print_data_handler
+from reactive.platform.websocket.client import Client
+from reactive.platform.websocket.handler import print_data_handler
+from reactive.platform.feed.feedrequest import FeedRequest
+from reactive.papi.FeedType import FeedType
+from reactive.papi.SubReqType import SubReqType
 
-MARKET_LIST = ["BTCUSD-BFN", "ETHUSD-BFN", "LTCUSD-BFN", "XRPUSD-BFN",
+
+MARKET_LIST = ["BCHUSD-BFN", "BTCUSD-BFN", "ETHUSD-BFN", "LTCUSD-BFN", "XRPUSD-BFN",
                "BCHUSDT-BIN", "BTCUSDT-BIN", "ETHUSDT-BIN", "LTCUSDT-BIN", "XRPUSDT-BIN",
                "BCHUSD-CNB", "BTCUSD-CNB", "ETHUSD-CNB", "LTCUSD-CNB", "XRPUSD-CNB"]
+
 TOKEN = ""
 ADDR = "wss://api.platform.reactivemarkets.com/feed"
 
@@ -31,26 +37,35 @@ def random_market():
     return MARKET_LIST[index]
 
 
-async def feed_client_handler(c: FeedClient):
+async def client_handler(c: Client):
     """
-    implement an application client_handler coroutine to and subscribe or
-    unsubscribe random marketdata.
+    implement a client_handle run coroutine to and subscribe or
+    unsubscribe market data for a random market.
     """
+
+    builder = flatbuffers.Builder(1400)
+    req_id = 0
     while True:
         market = random_market()
         print("sub", market)
-        await c.subscribe([market], depth=0, grouping=0)
-        await c.subscribe([market], depth=5)
+        req_id += 1
+        feed_request = FeedRequest(str(req_id), [market],
+                                   feed_type=FeedType.Default,
+                                   sub_req_type=SubReqType.Subscribe)
+        await c.send(feed_request.build_feed_request(builder))
         await asyncio.sleep(3)
         print("unsub", market)
-        await c.unsubscribe([market], depth=0, grouping=0)
-        await c.unsubscribe([market], depth=5)
+        req_id += 1
+        feed_request = FeedRequest(str(req_id), [market],
+                                   feed_type=FeedType.Default,
+                                   sub_req_type=SubReqType.Unsubscribe)
+        await c.send(feed_request.build_feed_request(builder))
         await asyncio.sleep(1)
 
 
 def run():
-    client = FeedClient(addr=ADDR, key=TOKEN, close_timeout=1.0)
-    run = asyncio.ensure_future(client.run(client_handler=feed_client_handler,
+    client = Client(addr=ADDR, key=TOKEN, close_timeout=1.0)
+    run = asyncio.ensure_future(client.run(client_handler=client_handler,
                                            data_handler=print_data_handler))
     asyncio.get_event_loop().run_until_complete(run)
 
