@@ -28,14 +28,14 @@ from reactive.platform.websocket.websocket import read, write
 class Client:
     """
     Client handles websocket connection with reactive platform. The data_handler must accept
-    an reactive.papi.Message.Message type, which is from reactive platform Flatbuffers
-    definition.
+    an reactive.papi.Message.Message type, which is in platform Flatbuffer message type in
+    reactive-papi package. See more support message type in reactive-papi package.
     """
 
     ADDRESS = "wss://api.platform.reactivemarkets.com/stream"
     IO_TIMEOUT = 2.0
 
-    def __init__(self, addr: str = None, key: str = None, close_timeout: float = IO_TIMEOUT):
+    def __init__(self, addr: str = None, api_key: str = None, close_timeout: float = IO_TIMEOUT):
         """
         Create a web socket client to connect platform.
 
@@ -47,8 +47,8 @@ class Client:
             key represents API key, which is used for verifying identity.
         """
         self.__addr = addr if addr is not None else self.ADDRESS
-        self.__key = key
-        self.header = Headers(Authorization="Bearer " + key) if key is not None else None
+        self.__api_key = api_key
+        self.header = Headers(Authorization="Bearer " + api_key) if api_key is not None else None
         self.close_timeout = close_timeout
 
         self.__builder = flatbuffers.Builder(1400)

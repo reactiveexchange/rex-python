@@ -22,7 +22,7 @@ from reactive.platform.feed.handler import print_data_handler
 MARKET_LIST = ["BTCUSD-BFN", "ETHUSD-BFN", "LTCUSD-BFN", "XRPUSD-BFN",
                "BCHUSDT-BIN", "BTCUSDT-BIN", "ETHUSDT-BIN", "LTCUSDT-BIN", "XRPUSDT-BIN",
                "BCHUSD-CNB", "BTCUSD-CNB", "ETHUSD-CNB", "LTCUSD-CNB", "XRPUSD-CNB"]
-TOKEN = ""
+API_KEY = ""
 ADDR = "wss://api.platform.reactivemarkets.com/feed"
 
 
@@ -39,17 +39,18 @@ async def feed_client_handler(c: FeedClient):
     while True:
         market = random_market()
         print("sub", market)
-        await c.subscribe([market], depth=0, grouping=0)
-        await c.subscribe([market], depth=5)
-        await asyncio.sleep(3)
+        await c.subscribe([market], depth=10, grouping=0)
+        # subscribe the same market with depth = 5, and 5 times conflation periods.
+        await c.subscribe([market], depth=5, freq=5)
+        await asyncio.sleep(20)
         print("unsub", market)
-        await c.unsubscribe([market], depth=0, grouping=0)
-        await c.unsubscribe([market], depth=5)
+        await c.unsubscribe([market], depth=10, grouping=0)
+        await c.unsubscribe([market], depth=5, freq=5)
         await asyncio.sleep(1)
 
 
 def run():
-    client = FeedClient(addr=ADDR, key=TOKEN, close_timeout=1.0)
+    client = FeedClient(addr=ADDR, api_key=API_KEY, close_timeout=1.0)
     run = asyncio.ensure_future(client.run(client_handler=feed_client_handler,
                                            data_handler=print_data_handler))
     asyncio.get_event_loop().run_until_complete(run)

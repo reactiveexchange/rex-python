@@ -15,12 +15,13 @@
 
 from reactive.platform.rest.client import Client
 
-KEY = "xxx"
+API_KEY = "xxx"
 URL = "https://api.platform.reactivemarkets.com"
 
 
 if __name__ == "__main__":
-    rc = Client(url=URL, key=KEY)
+
+    rc = Client(url=URL, api_key=API_KEY)
     asset_ref = rc.fetch_asset_ref()
     # json format assets reference data
     assets = asset_ref.to_json()

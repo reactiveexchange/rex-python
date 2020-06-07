@@ -26,17 +26,17 @@ from reactive.platform.websocket.client import Client
 
 class FeedClient(Client):
     """
-    FeedClient is a derived class of Client and handle feed connection, client cloud
-    send feed request by subscribe and unsubscribe method and receive level2 book
-    or feed request reject. Feed request reject will display in the console, and flatbuffers
-    formatted Level2Snapshot will be converted into Level2Book object and trigger the callback
-    handle. Client must provide handler function which has the contract like handler(Level2book)
-
+    FeedClient is a derived class of Client and handle feed connection, client could send feed
+    request by calling subscribe and unsubscribe method and, receive data from platform (level2
+    book, trade or feed request reject). The receiving messages are Flatbuffer messages, and
+    FeedClient converts into corresponding object and trigger the callback data_handler.
+    If want to handle raw flatbuffer message via reactive-papi package, use
+    base class Client, instead.
     """
 
     ADDRESS = 'wss://api.platform.reactivemarkets.com/feed'
 
-    def __init__(self, addr: str = None, key: str = None, close_timeout: float = 2.0):
+    def __init__(self, addr: str = None, api_key: str = None, close_timeout: float = 2.0):
         """
         Parameters
         ----------
@@ -49,17 +49,17 @@ class FeedClient(Client):
             the TCP connection.
         """
         addr = addr if addr is not None else self.ADDRESS
-        super().__init__(key=key, addr=addr, close_timeout=close_timeout)
+        super().__init__(api_key=api_key, addr=addr, close_timeout=close_timeout)
         self.req_id = 0
 
     async def subscribe(self, markets: List[str],
                         feed_type: int = FbsFeedType.FeedType.Default,
                         depth: int = 10,
                         grouping: int = 1,
-                        frequency: int = 100):
+                        freq: int = 1):
         """
         subscribe sends a subscription FeedRequest to reactive platform, the default request is
-        marketdata request.
+        a marketdata request.
 
         Parameters
         ----------
@@ -74,21 +74,20 @@ class FeedClient(Client):
         grouping: int, default 1
           subscribe marketdata l2 orderbook grouping ticks per level, if feed_type is Default,
           otherwise the field is ignored.
-        frequency: int, default 100
-          required marketdata update frequency by millisecond, if feed_type is Default,
-          otherwise the field is ignored.
+        freq: int, default 1
+          required marketdata update frequency, if feed_type is Default.
+          otherwise the field is ignored by the platform.
         """
-        # FIXME: check if market is already subscribed and only subscribe new markets.
         self.req_id += 1
         fr = FeedRequest(req_id=str(self.req_id), grouping=grouping, markets=markets,
                          sub_req_type=FbsSrt.SubReqType.Subscribe, feed_type=feed_type,
-                         frequency=frequency, depth=depth)
+                         freq=freq, depth=depth)
         await self.send(fr.build_feed_request(self.builder))
 
     async def unsubscribe(self, markets: List[str],
                           feed_type: int = FbsFeedType.FeedType.Default,
                           depth: int = 10, grouping: int = 1,
-                          frequency: int = 1):
+                          freq: int = 1):
         """
         unsubscribe sends a unsubscription FeedRequest to reactive platform, the default request is
         marketdata request.
@@ -96,13 +95,13 @@ class FeedClient(Client):
         self.req_id += 1
         fr = FeedRequest(req_id=str(self.req_id), grouping=grouping, markets=markets,
                          sub_req_type=FbsSrt.SubReqType.Unsubscribe, feed_type=feed_type,
-                         frequency=frequency, depth=depth)
+                         freq=freq, depth=depth)
         await self.send(fr.build_feed_request(self.builder))
 
     async def _read(self, buf: AnyStr):
         """
         _read overrides the Client _read method, and decoding fbs.Message into the
-        corresponding object and call the callback handler.
+        corresponding object and call the callback data_handler.
         """
         msg = FbsMessage.Message.GetRootAsMessage(buf, 0)
         self.data_handler(load_from_fbs(msg))

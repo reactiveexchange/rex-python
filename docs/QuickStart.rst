@@ -17,9 +17,9 @@ Create a Rest API `Client` with the token and platform address.
 .. code:: python
 
     from reactive.platform.rest.client import Client
-    key = 'xxx'
+    api_key = 'xxx'
     url = "https://api.platform.reactivemarkets.com"
-    rc = Client(url=url, key=key)
+    rc = Client(url=url, api_key=api_key)
 
 Use methods of `rc` client to access data.
 

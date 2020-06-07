@@ -27,20 +27,20 @@ from typing import List
 
 class FeedRequest:
     """
-    FeedRequest class is responsible for creating a feed.FeedRequest flatbuffer message.
+    FeedRequest class is responsible for creating a feed.FeedRequest FlatBuffer message.
     """
     def __init__(self, req_id: str, markets: List[str],
                  feed_type: int = FbsFeedType.FeedType.Default,
                  depth: int = 10,
                  grouping: int = 1,
                  sub_req_type: int = FbsSrt.SubReqType.Subscribe,
-                 frequency: int = 1):
+                 freq: int = 1):
         self.req_id = req_id
         self.markets = markets
         self.sub_req_type = sub_req_type
         self.grouping = grouping
         self.feed_type = feed_type
-        self.frequency = frequency
+        self.freq = freq
         self.depth = depth
 
     def build_feed_request(self, builder: flatbuffers.Builder) -> bytearray:
@@ -62,7 +62,7 @@ class FeedRequest:
         FbsFr.FeedRequestAddFeedType(builder, self.feed_type)
         FbsFr.FeedRequestAddGrouping(builder, self.grouping)
         FbsFr.FeedRequestAddDepth(builder, self.depth)
-        FbsFr.FeedRequestAddFrequency(builder, self.frequency)
+        FbsFr.FeedRequestAddFrequency(builder, self.freq)
         FbsFr.FeedRequestAddMarkets(builder, markets)
         feed_req = FbsFr.FeedRequestEnd(builder)
 
