@@ -19,7 +19,7 @@ from reactive.platform.feed.client import FeedClient
 from reactive.platform.feed.handler import print_data_handler
 from reactive.papi.FeedType import FeedType
 
-TOKEN = ""
+API_KEY = ""
 ADDR = "wss://api.platform.reactivemarkets.com/feed"
 
 
@@ -33,7 +33,7 @@ async def feed_client_handler(c: FeedClient):
 
 
 def run():
-    client = FeedClient(addr=ADDR, key=TOKEN, close_timeout=1.0)
+    client = FeedClient(addr=ADDR, api_key=API_KEY, close_timeout=1.0)
     run = asyncio.ensure_future(client.run(client_handler=feed_client_handler,
                                            data_handler=print_data_handler))
     asyncio.get_event_loop().run_until_complete(run)

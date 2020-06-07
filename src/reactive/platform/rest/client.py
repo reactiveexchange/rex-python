@@ -40,7 +40,7 @@ class Client(metaclass=Cached):
 
     URL = "https://api.platform.reactivemarkets.com"
 
-    def __init__(self, url: str = None, key: str = None):
+    def __init__(self, url: str = None, api_key: str = None):
         """
         Create Client.
 
@@ -48,14 +48,14 @@ class Client(metaclass=Cached):
         ----------
         url: url
             trading platform api url.
-        key: str
+        api_key: str
             exchange API token.
         """
-        key = key if key is not None else os.getenv("REACTIVE_API_TOKEN")
-        if key is None:
+        api_key = api_key if api_key is not None else os.getenv("REACTIVE_API_TOKEN")
+        if api_key is None:
             raise TokenNotFound("API key not found")
 
-        self.__headers = {'Authorization': 'Bearer ' + key}
+        self.__headers = {'Authorization': 'Bearer ' + api_key}
         self.__url = url if url is not None else self.URL
 
     def fetch_asset_ref(self) -> AssetRefData:
