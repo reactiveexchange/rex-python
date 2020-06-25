@@ -15,22 +15,23 @@
 """
 Summary
 -------
-Public trade data structures.
+Liquidation order data structures.
 
 """
 
-import reactive.papi.PublicTrade as FbsPt
+import reactive.papi.LiquidationOrder as FbsLo
 
 
-class PublicTrade:
+class LiquidationOrder:
 
     def __init__(self, market: str, side: int, qty: float, price: float,
-                 source_ts: int = 0, source: str = "", trade_id: str = "",
-                 flags: int = 0, exec_venue: str = ""):
+                 source_ts: int = 0, source: str = "", feed_id: int = 0,
+                 order_id: str = "", flags: int = 0, exec_venue: str = ""):
         self.source_ts = source_ts
         self.source = source
         self.market = market
-        self.trade_id = trade_id
+        self.feed_id = feed_id
+        self.order_id = order_id
         self.flags = flags
         self.side = side
         self.qty = qty
@@ -38,8 +39,9 @@ class PublicTrade:
         self.exec_venue = exec_venue
 
     @classmethod
-    def load_from_fbs(cls, trade: FbsPt.PublicTrade):
-        return cls(market=trade.Market(), side=trade.Side(), qty=trade.Qty(),
-                   price=trade.Qty(), source_ts=trade.SourceTs(), source=trade.Source(),
-                   trade_id=trade.TradeId(), flags=trade.Flags(),
-                   exec_venue=trade.ExecVenue())
+    def load_from_fbs(cls, liquidation: FbsLo.LiquidationOrder):
+        return cls(market=liquidation.Market(), side=liquidation.Side(), qty=liquidation.Qty(),
+                   price=liquidation.Qty(), source_ts=liquidation.SourceTs(),
+                   source=liquidation.Source(), feed_id=liquidation.FeedId(),
+                   order_id=liquidation.OrderId(), flags=liquidation.Flags(),
+                   exec_venue=liquidation.ExecVenue())

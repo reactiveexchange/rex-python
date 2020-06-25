@@ -78,7 +78,8 @@ df
 
 ## Platform WebSocket API
 
-The websocket feed provides real-time level 2 market data snapshots and public trades via
+The websocket feed provides real-time level 2 market data snapshots, public trades and liquidation
+via
 
 ```
 wss://api.platform.reactivemarkets.com/feed

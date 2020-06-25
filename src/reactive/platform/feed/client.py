@@ -59,7 +59,7 @@ class FeedClient(Client):
                         freq: int = 1):
         """
         subscribe sends a subscription FeedRequest to reactive platform, the default request is
-        a marketdata request.
+        a market data request.
 
         Parameters
         ----------
@@ -75,7 +75,7 @@ class FeedClient(Client):
           subscribe marketdata l2 orderbook grouping ticks per level, if feed_type is Default,
           otherwise the field is ignored.
         freq: int, default 1
-          required marketdata update frequency, if feed_type is Default.
+          required market data update frequency, if feed_type is Default.
           otherwise the field is ignored by the platform.
         """
         self.req_id += 1

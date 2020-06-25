@@ -35,6 +35,29 @@ class FeedRequest:
                  grouping: int = 1,
                  sub_req_type: int = FbsSrt.SubReqType.Subscribe,
                  freq: int = 1):
+        """
+        Parameters
+        ----------
+        req_id : str
+          Feed request from client, should be echo back in FeedAccept message.
+        markets : List[str]
+          list of markets to subscribe.
+        feed_type : int
+          FeedType : 0 (Default for market data)
+                     1 (Trade)
+                     2 (Liquidation)
+        depth : int
+          order book depth, if feed_type is 0, otherwise, this field is ignored.
+        grouping : int
+          grouping in aggregate algo on order book, if feed_type is 0, otherwise, this
+          field is ignore.
+        sub_req_type : int
+           1: subscribe
+           2: unsubscribe
+        freq : int
+          book update frequency in milliseconds, if feed_type is 0, otherwise, this field is
+          ignored.
+        """
         self.req_id = req_id
         self.markets = markets
         self.sub_req_type = sub_req_type

@@ -37,9 +37,13 @@ def print_data_handler(msg: Message):
         best_bid = None if bid_length == 0 else body.BidSide(0).Price()
         offer_length = body.OfferSideLength()
         best_offer = None if offer_length == 0 else body.OfferSide(0).Price()
-        print(market, best_bid, best_offer)
+        print("market data:", market, best_bid, best_offer)
     elif body_type == Body.PublicTrade:
-        print(body.Market(), body.ExecVenue(), body.Price(), body.Qty(), body.Side())
+        print("public trade:", body.Market(), body.ExecVenue(), body.Price(), body.Qty(),
+              body.Side())
+    elif body_type == Body.LiquidationOrder:
+        print("liquidation:", body.Market(), body.ExecVenue(), body.Price(), body.Qty(),
+              body.Side())
     elif body_type == Body.FeedRequestReject:
         print(f"feed request {body.ReqId()} is rejected: {body.ErrorCode()},"
               f"{body.ErrorMessage()}")
