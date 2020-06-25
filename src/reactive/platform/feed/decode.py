@@ -20,6 +20,7 @@ from reactive.papi.Message import Message
 
 from reactive.platform.feed.feedaccept import FeedRequestAccept
 from reactive.platform.feed.feedrequestreject import FeedRequestReject
+from reactive.platform.feed.liquidation import LiquidationOrder
 from reactive.platform.feed.mdsnapshotl2 import MDSnapshotL2
 from reactive.platform.feed.publictrade import PublicTrade
 
@@ -41,3 +42,5 @@ def load_from_fbs(msg: Message) -> Union[MDSnapshotL2, FeedRequestAccept,
         return MDSnapshotL2.load_from_fbs(body)
     elif body_type == Body.PublicTrade:
         return PublicTrade.load_from_fbs(body)
+    elif body_type == Body.LiquidationOrder:
+        return LiquidationOrder.load_from_fbs(body)

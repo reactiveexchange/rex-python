@@ -19,6 +19,7 @@ from typing import Union, Tuple
 from reactive.papi.Body import Body
 from reactive.papi.FeedRequestAccept import FeedRequestAccept
 from reactive.papi.FeedRequestReject import FeedRequestReject
+from reactive.papi.LiquidationOrder import LiquidationOrder
 from reactive.papi.MDSnapshotL2 import MDSnapshotL2
 from reactive.papi.Message import Message
 from reactive.papi.PublicTrade import PublicTrade
@@ -26,8 +27,10 @@ from reactive.papi.PublicTrade import PublicTrade
 
 def decode_fbs(msg: Message) -> Tuple[Body, Union[MDSnapshotL2,
                                                   PublicTrade,
+                                                  LiquidationOrder,
                                                   FeedRequestReject,
-                                                  FeedRequestAccept]]:
+                                                  FeedRequestAccept,
+                                                  None]]:
     """
     Decode a reactive.papi.Message into the Msg BodyType and body object.
     """
@@ -47,5 +50,9 @@ def decode_fbs(msg: Message) -> Tuple[Body, Union[MDSnapshotL2,
         fra = FeedRequestAccept()
         fra.Init(msg.Body().Bytes, msg.Body().Pos)
         return Body.FeedRequestAccept, fra
+    elif msg.BodyType() == Body.LiquidationOrder:
+        lo = LiquidationOrder()
+        lo.Init(msg.Body().Bytes, msg.Body().Pos)
+        return Body.LiquidationOrder, lo
     else:
         return Body.NONE, None
